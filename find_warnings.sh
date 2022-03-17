@@ -1,5 +1,5 @@
 #!/bin/bash
-# 1 nothing change
+# 2 nothing change
 gcc -Wall $1 -o test 2>warning.txt
 a=$?
 grep 'warning' warning.txt >warning1.txt
