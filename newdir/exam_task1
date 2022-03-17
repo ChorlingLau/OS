@@ -1,3 +1,0 @@
-grep -r -n "hello OS lab0" >lab0_exam.c
-find -r lab0_x >>lab0_exam.c
-sed 's/.\/dir/dir/g' lab0_exam.c
