@@ -1,5 +1,5 @@
 #!/bin/bash
-# 3 nothing change
+# 4 nothing change
 touch result.txt
 gcc -Wall $1 -o test 2>warning.txt
 a=$?
