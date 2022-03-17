@@ -1,9 +1,10 @@
 #!/bin/bash
 # 2 nothing change
+touch result.txt
 gcc -Wall $1 -o test 2>warning.txt
 a=$?
-grep 'warning' warning.txt >warning1.txt
-sed 's/warning: //g' warning1.txt >result.txt
+grep 'warning' warning.txt >result.txt
+sed 's/warning: //g' result.txt >result.txt
 if [ $a -eq 0 ]
 then
 	i=1
