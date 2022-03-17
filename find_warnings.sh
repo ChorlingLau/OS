@@ -3,8 +3,8 @@
 touch result.txt
 gcc -Wall $1 -o test 2>warning.txt
 a=$?
-grep 'warning' warning.txt >result1.txt
-sed 's/warning: //g' result1.txt >result.txt
+grep 'warning' warning.txt >1result.txt
+sed 's/warning: //g' 1result.txt >result.txt
 if [ $a -eq 0 ]
 then
 	i=1
