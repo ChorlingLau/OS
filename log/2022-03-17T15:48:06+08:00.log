@@ -1,0 +1,241 @@
+[33m[01m[05m[ You are changing the branch: lab0-Extra ][0m
+Autotest: Begin at Thu Mar 17 15:48:06 CST 2022
+[32m[ You have passed testcase 1/10. ][0m
+runtime/cgo: pthread_create failed: Resource temporarily unavailable
+SIGABRT: abort
+PC=0x7f1412f7703b m=0 sigcode=18446744073709551610
+
+goroutine 0 [idle]:
+runtime: unknown pc 0x7f1412f7703b
+stack: frame={sp:0x7ffda67e08c0, fp:0x0} stack=[0x7ffda5de1db0,0x7ffda67e0df0)
+00007ffda67e07c0:  0000000000000000  0000000000000000 
+00007ffda67e07d0:  0000000000000000  0000000000000000 
+00007ffda67e07e0:  0000000000000000  00007f141314a298 
+00007ffda67e07f0:  00007ffda67e0b80  0000000000001000 
+00007ffda67e0800:  00007f140e4bb700  00007ffda67e0c10 
+00007ffda67e0810:  000055926ee57700  00007f1413171187 
+00007ffda67e0820:  0000000000000005  0000000000000000 
+00007ffda67e0830:  0000000000000120  00007f1413160790 
+00007ffda67e0840:  00007ffda67e0a90  00007f1413178aa7 
+00007ffda67e0850:  000055926ee57700  000055926ee57800 
+00007ffda67e0860:  000055926ee57800  0000000000000000 
+00007ffda67e0870:  00007f140e4bb700  0000000000000000 
+00007ffda67e0880:  0000000000000fff  0000000000000000 
+00007ffda67e0890:  000000000000037f  0000000000000000 
+00007ffda67e08a0:  0000000000000000  0000ffff00001fa0 
+00007ffda67e08b0:  0000000000000000  0000000000000000 
+00007ffda67e08c0: <0000000000000000  0000000000000000 
+00007ffda67e08d0:  0000000000000000  0000000000000000 
+00007ffda67e08e0:  0000000000000000  0000000000000000 
+00007ffda67e08f0:  0000000000000000  0000000000000000 
+00007ffda67e0900:  0000000000000000  0000000000000000 
+00007ffda67e0910:  0000000000000000  0000000000000000 
+00007ffda67e0920:  0000000000000000  0000000000000000 
+00007ffda67e0930:  0000000000000000  0000000000000000 
+00007ffda67e0940:  fffffffe7fffffff  ffffffffffffffff 
+00007ffda67e0950:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0960:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0970:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0980:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0990:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e09a0:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e09b0:  ffffffffffffffff  ffffffffffffffff 
+runtime: unknown pc 0x7f1412f7703b
+stack: frame={sp:0x7ffda67e08c0, fp:0x0} stack=[0x7ffda5de1db0,0x7ffda67e0df0)
+00007ffda67e07c0:  0000000000000000  0000000000000000 
+00007ffda67e07d0:  0000000000000000  0000000000000000 
+00007ffda67e07e0:  0000000000000000  00007f141314a298 
+00007ffda67e07f0:  00007ffda67e0b80  0000000000001000 
+00007ffda67e0800:  00007f140e4bb700  00007ffda67e0c10 
+00007ffda67e0810:  000055926ee57700  00007f1413171187 
+00007ffda67e0820:  0000000000000005  0000000000000000 
+00007ffda67e0830:  0000000000000120  00007f1413160790 
+00007ffda67e0840:  00007ffda67e0a90  00007f1413178aa7 
+00007ffda67e0850:  000055926ee57700  000055926ee57800 
+00007ffda67e0860:  000055926ee57800  0000000000000000 
+00007ffda67e0870:  00007f140e4bb700  0000000000000000 
+00007ffda67e0880:  0000000000000fff  0000000000000000 
+00007ffda67e0890:  000000000000037f  0000000000000000 
+00007ffda67e08a0:  0000000000000000  0000ffff00001fa0 
+00007ffda67e08b0:  0000000000000000  0000000000000000 
+00007ffda67e08c0: <0000000000000000  0000000000000000 
+00007ffda67e08d0:  0000000000000000  0000000000000000 
+00007ffda67e08e0:  0000000000000000  0000000000000000 
+00007ffda67e08f0:  0000000000000000  0000000000000000 
+00007ffda67e0900:  0000000000000000  0000000000000000 
+00007ffda67e0910:  0000000000000000  0000000000000000 
+00007ffda67e0920:  0000000000000000  0000000000000000 
+00007ffda67e0930:  0000000000000000  0000000000000000 
+00007ffda67e0940:  fffffffe7fffffff  ffffffffffffffff 
+00007ffda67e0950:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0960:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0970:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0980:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e0990:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e09a0:  ffffffffffffffff  ffffffffffffffff 
+00007ffda67e09b0:  ffffffffffffffff  ffffffffffffffff 
+
+goroutine 1 [running, locked to thread]:
+runtime.asmcgocall(0x55926bb7c200, 0xc00007e708)
+	/usr/lib/go-1.13/src/runtime/asm_amd64.s:640 +0x3f fp=0xc00007e6f0 sp=0xc00007e6e8 pc=0x55926a60e3bf
+runtime.newm1(0xc0000b2380)
+	/usr/lib/go-1.13/src/runtime/proc.go:1848 +0xa6 fp=0xc00007e730 sp=0xc00007e6f0 pc=0x55926a5e6a86
+runtime.newm(0x55926c5b2318, 0x0)
+	/usr/lib/go-1.13/src/runtime/proc.go:1832 +0x93 fp=0xc00007e760 sp=0xc00007e730 pc=0x55926a5e6923
+runtime.startTemplateThread(...)
+	/usr/lib/go-1.13/src/runtime/proc.go:1868
+runtime.main()
+	/usr/lib/go-1.13/src/runtime/proc.go:186 +0x2cb fp=0xc00007e7e0 sp=0xc00007e760 pc=0x55926a5e2b5b
+runtime.goexit()
+	/usr/lib/go-1.13/src/runtime/asm_amd64.s:1357 +0x1 fp=0xc00007e7e8 sp=0xc00007e7e0 pc=0x55926a60ec81
+
+rax    0x0
+rbx    0x7f1412f31740
+rcx    0x7f1412f7703b
+rdx    0x0
+rdi    0x2
+rsi    0x7ffda67e08c0
+rbp    0x7ffda67e0c10
+rsp    0x7ffda67e08c0
+r8     0x0
+r9     0x7ffda67e08c0
+r10    0x8
+r11    0x246
+r12    0x55926be5fa6a
+r13    0x7ffda67e0cd0
+r14    0x55926be142f8
+r15    0x0
+rip    0x7f1412f7703b
+rflags 0x246
+cs     0x33
+fs     0x0
+gs     0x0
+runtime/cgo: pthread_create failed: Resource temporarily unavailable
+SIGABRT: abort
+PC=0x7fd09974003b m=0 sigcode=18446744073709551610
+
+goroutine 0 [idle]:
+runtime: unknown pc 0x7fd09974003b
+stack: frame={sp:0x7ffc0fbb3af0, fp:0x0} stack=[0x7ffc0f1b5170,0x7ffc0fbb41b0)
+00007ffc0fbb39f0:  0000000000000003  00007fd099919280 
+00007ffc0fbb3a00:  0000000000000001  0000000000000000 
+00007ffc0fbb3a10:  0000000000000001  00007fd099913298 
+00007ffc0fbb3a20:  00007ffc0fbb3db0  0000000000001000 
+00007ffc0fbb3a30:  00007fd094c84700  00007ffc0fbb3e40 
+00007ffc0fbb3a40:  0000556c89f65700  00007fd09993a187 
+00007ffc0fbb3a50:  0000000000000005  0000000000000000 
+00007ffc0fbb3a60:  00000000ffffffff  00007fd099929790 
+00007ffc0fbb3a70:  00007ffc0fbb3cc0  00007fd099941aa7 
+00007ffc0fbb3a80:  0000556c89f65700  0000556c89f65800 
+00007ffc0fbb3a90:  0000556c89f65800  0000000000000000 
+00007ffc0fbb3aa0:  00007fd094c84700  0000000000000000 
+00007ffc0fbb3ab0:  0000000000000fff  00007fd099913028 
+00007ffc0fbb3ac0:  000000000000037f  0000000000000000 
+00007ffc0fbb3ad0:  0000000000000000  0000ffff00001fa0 
+00007ffc0fbb3ae0:  0000000000000000  0000000000000000 
+00007ffc0fbb3af0: <0000000000000000  0000000000000000 
+00007ffc0fbb3b00:  0000000000000000  0000000000000000 
+00007ffc0fbb3b10:  0000000000000000  0000000000000000 
+00007ffc0fbb3b20:  0000000000000000  0000000000000000 
+00007ffc0fbb3b30:  0000000000000000  0000000000000000 
+00007ffc0fbb3b40:  0000000000000000  0000000000000000 
+00007ffc0fbb3b50:  0000000000000000  0000000000000000 
+00007ffc0fbb3b60:  0000000000000000  0000000000000000 
+00007ffc0fbb3b70:  fffffffe7fffffff  ffffffffffffffff 
+00007ffc0fbb3b80:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3b90:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3ba0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3bb0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3bc0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3bd0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3be0:  ffffffffffffffff  ffffffffffffffff 
+runtime: unknown pc 0x7fd09974003b
+stack: frame={sp:0x7ffc0fbb3af0, fp:0x0} stack=[0x7ffc0f1b5170,0x7ffc0fbb41b0)
+00007ffc0fbb39f0:  0000000000000003  00007fd099919280 
+00007ffc0fbb3a00:  0000000000000001  0000000000000000 
+00007ffc0fbb3a10:  0000000000000001  00007fd099913298 
+00007ffc0fbb3a20:  00007ffc0fbb3db0  0000000000001000 
+00007ffc0fbb3a30:  00007fd094c84700  00007ffc0fbb3e40 
+00007ffc0fbb3a40:  0000556c89f65700  00007fd09993a187 
+00007ffc0fbb3a50:  0000000000000005  0000000000000000 
+00007ffc0fbb3a60:  00000000ffffffff  00007fd099929790 
+00007ffc0fbb3a70:  00007ffc0fbb3cc0  00007fd099941aa7 
+00007ffc0fbb3a80:  0000556c89f65700  0000556c89f65800 
+00007ffc0fbb3a90:  0000556c89f65800  0000000000000000 
+00007ffc0fbb3aa0:  00007fd094c84700  0000000000000000 
+00007ffc0fbb3ab0:  0000000000000fff  00007fd099913028 
+00007ffc0fbb3ac0:  000000000000037f  0000000000000000 
+00007ffc0fbb3ad0:  0000000000000000  0000ffff00001fa0 
+00007ffc0fbb3ae0:  0000000000000000  0000000000000000 
+00007ffc0fbb3af0: <0000000000000000  0000000000000000 
+00007ffc0fbb3b00:  0000000000000000  0000000000000000 
+00007ffc0fbb3b10:  0000000000000000  0000000000000000 
+00007ffc0fbb3b20:  0000000000000000  0000000000000000 
+00007ffc0fbb3b30:  0000000000000000  0000000000000000 
+00007ffc0fbb3b40:  0000000000000000  0000000000000000 
+00007ffc0fbb3b50:  0000000000000000  0000000000000000 
+00007ffc0fbb3b60:  0000000000000000  0000000000000000 
+00007ffc0fbb3b70:  fffffffe7fffffff  ffffffffffffffff 
+00007ffc0fbb3b80:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3b90:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3ba0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3bb0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3bc0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3bd0:  ffffffffffffffff  ffffffffffffffff 
+00007ffc0fbb3be0:  ffffffffffffffff  ffffffffffffffff 
+
+goroutine 1 [runnable, locked to thread]:
+runtime.gopark(0x556c87357270, 0xc0000a6058, 0x170e, 0x3)
+	/usr/lib/go-1.13/src/runtime/proc.go:304 +0xe6
+runtime.goparkunlock(...)
+	/usr/lib/go-1.13/src/runtime/proc.go:310
+runtime.chanrecv(0xc0000a6000, 0x0, 0xc000000101, 0x556c85370101)
+	/usr/lib/go-1.13/src/runtime/chan.go:524 +0x2ec
+runtime.chanrecv1(0xc0000a6000, 0x0)
+	/usr/lib/go-1.13/src/runtime/chan.go:406 +0x2b
+runtime.gcenable()
+	/usr/lib/go-1.13/src/runtime/mgc.go:213 +0xae
+runtime.main()
+	/usr/lib/go-1.13/src/runtime/proc.go:166 +0x129
+runtime.goexit()
+	/usr/lib/go-1.13/src/runtime/asm_amd64.s:1357 +0x1
+
+rax    0x0
+rbx    0x7fd0996fa740
+rcx    0x7fd09974003b
+rdx    0x0
+rdi    0x2
+rsi    0x7ffc0fbb3af0
+rbp    0x7ffc0fbb3e40
+rsp    0x7ffc0fbb3af0
+r8     0x0
+r9     0x7ffc0fbb3af0
+r10    0x8
+r11    0x246
+r12    0x556c86c04a6a
+r13    0x7ffc0fbb3f00
+r14    0x556c86bb92f8
+r15    0x0
+rip    0x7fd09974003b
+rflags 0x246
+cs     0x33
+fs     0x0
+gs     0x0
+diff: /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result.txt: No such file or directory
+diff: /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result_ans.txt: No such file or directory
+[31m[01m[ Can not find your result.txt ][0m
+Files /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result.txt and /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result_ans.txt differ
+[31m[01m[ You have not passed testcase 3/10. ][0m
+Files /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result.txt and /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result_ans.txt differ
+[31m[01m[ You have not passed testcase 4/10. ][0m
+[32m[ You have passed testcase 5/10. ][0m
+[32m[ You have passed testcase 6/10. ][0m
+[32m[ You have passed testcase 7/10. ][0m
+Files /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result.txt and /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result_ans.txt differ
+[31m[01m[ You have not passed testcase 8/10. ][0m
+Files /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result.txt and /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result_ans.txt differ
+[31m[01m[ You have not passed testcase 9/10. ][0m
+Files /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result.txt and /home/git/ostest/target/20373453/lab0-Extra-2022-03-17T15:48:06+08:00-ZGUCp/result_ans.txt differ
+[31m[01m[ You have not passed testcase 10/10. ][0m
+[33m[01m[ You got 40 (of 100) this time. Thu Mar 17 16:00:14 CST 2022 ][0m
+Autotest: End at Thu Mar 17 16:00:14 CST 2022
