@@ -73,7 +73,7 @@ int readelf(u_char *binary, int size)
 			shdr = (Elf32_Shdr *)(ptr_sh_table + i * sh_entry_size);
 			printf("%d:0x%x\n", i, shdr->sh_addr);
 		}
-
+		// printf("e_type: %d\n", ehdr->e_type);
         return 0;
 }
 

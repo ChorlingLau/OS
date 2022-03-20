@@ -8,7 +8,7 @@ CC        := gcc
 .PHONY: clean
 
 readelf: main.o readelf.o 
-	$(CC) main.o readelf.o -o readelf
+	$(CC) -g main.o readelf.o -o readelf
 
 
 clean:
