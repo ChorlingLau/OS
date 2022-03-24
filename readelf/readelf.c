@@ -43,17 +43,18 @@ int is_elf_format(u_char *binary)
 /*
     Exercise 1.2. Please complete func "readelf". 
 */
+#define BY2PG 4096
 int readelf(u_char *binary, int size)
 {
         Elf32_Ehdr *ehdr = (Elf32_Ehdr *)binary;
 
         int Nr;
 
-        Elf32_Shdr *shdr = NULL;
+        Elf32_Phdr *phdr = NULL;
 
-        u_char *ptr_sh_table = NULL;
-        Elf32_Half sh_entry_count;
-        Elf32_Half sh_entry_size;
+        u_char *ptr_ph_table = NULL;
+        Elf32_Half ph_entry_count;
+        Elf32_Half ph_entry_size;
 
 
         // check whether `binary` is a ELF file.
@@ -63,16 +64,46 @@ int readelf(u_char *binary, int size)
         }
 
         // get section table addr, section header number and section header size.
-		ptr_sh_table = binary + ehdr->e_shoff;
-		sh_entry_count = ehdr->e_shnum;
-		sh_entry_size = ehdr->e_shentsize;
+		ptr_ph_table = binary + ehdr->e_phoff;
+		ph_entry_count = ehdr->e_phnum;
+		ph_entry_size = ehdr->e_phentsize;
         // for each section header, output section number and section addr. 
         // hint: section number starts at 0.
 		Elf32_Half i = 0;
-		for (; i < sh_entry_count; i++) {
-			shdr = (Elf32_Shdr *)(ptr_sh_table + i * sh_entry_size);
-			printf("%d:0x%x\n", i, shdr->sh_addr);
+		int flag = 0;
+		Elf32_Addr addr = 0xffffffff; 
+		for (; i < ph_entry_count; i++) {
+			phdr = (Elf32_Phdr *)(ptr_ph_table + i * ph_entry_size);
+			Elf32_Addr l_1, r_1, l_2, r_2;
+			l_1 = phdr->p_offset + phdr->p_vaddr;
+			r_1 = l_1 + phdr->p_filesz;
+			for ( Elf32_Half j = 0; j < ph_entry_count; j++) {
+				if (i == j) continue;
+				Elf32_Phdr *p = (Elf32_Phdr *)(ptr_ph_table + j * ph_entry_size);
+				l_2 = p->p_offset + p->p_vaddr;
+				r_2 = l_2 + p->p_filesz;
+				if (ROUNDDOWN(r_1, BY2PG) == ROUNDDOWN(l_2, BY2PG)) {
+					flag = 1;
+					addr = p->p_vaddr;
+					if (l_2 < r_1) {
+						flag = 2;
+						break;
+					}
+					break;
+				}
+			}			
 		}
+		if (flag == 0) {
+            for(i = 0; i < ph_entry_count; i++){
+                    printf("%d:0x%x,0x%x\n", i, phdr->p_filesz, phdr->p_memsz);
+                }
+        }
+		else if (flag == 1) {
+            printf("Overlay at page va : 0x%x\n", addr);
+        }
+        else {
+            printf("Conflict at page va : 0x%x\n", addr);
+        }
 		// printf("e_type: %d\n", ehdr->e_type);
         return 0;
 }
