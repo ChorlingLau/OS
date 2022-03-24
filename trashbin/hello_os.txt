@@ -1,2 +1,0 @@
-2:// os_hello.c
-5:	char hello[20]="os_helLo";
