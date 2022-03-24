@@ -75,13 +75,13 @@ int readelf(u_char *binary, int size)
 		for (; i < ph_entry_count; i++) {
 			phdr = (Elf32_Phdr *)(ptr_ph_table + i * ph_entry_size);
 			Elf32_Addr l_1, r_1, l_2, r_2;
-			l_1 = phdr->p_offset + phdr->p_vaddr;
-			r_1 = l_1 + phdr->p_filesz;
+			l_1 = phdr->p_vaddr;
+			r_1 = l_1 + phdr->p_memsz;
 			for ( Elf32_Half j = 0; j < ph_entry_count; j++) {
 				if (i == j) continue;
 				Elf32_Phdr *p = (Elf32_Phdr *)(ptr_ph_table + j * ph_entry_size);
-				l_2 = p->p_offset + p->p_vaddr;
-				r_2 = l_2 + p->p_filesz;
+				l_2 = p->p_vaddr;
+				r_2 = l_2 + p->p_memsz;
 				if (ROUNDDOWN(r_1, BY2PG) == ROUNDDOWN(l_2, BY2PG)) {
 					flag = 1;
 					addr = p->p_vaddr;
