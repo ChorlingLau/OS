@@ -1,0 +1,115 @@
+
+sample:     file format elf32-tradbigmips
+
+Disassembly of section .reginfo:
+
+00400094 <.reginfo>:
+  400094:	f200003c 	0xf200003c
+	...
+  4000a8:	10007ff0 	b	42006c <add+0x1ff1c>
+Disassembly of section .text:
+
+004000b0 <main>:
+  4000b0:	3c1c0fc0 	lui	gp,0xfc0
+  4000b4:	279c7f40 	addiu	gp,gp,32576
+  4000b8:	0399e021 	addu	gp,gp,t9
+  4000bc:	27bdffd0 	addiu	sp,sp,-48
+  4000c0:	afbf002c 	sw	ra,44(sp)
+  4000c4:	afbe0028 	sw	s8,40(sp)
+  4000c8:	03a0f021 	move	s8,sp
+  4000cc:	afbc0010 	sw	gp,16(sp)
+  4000d0:	24020001 	li	v0,1
+  4000d4:	afc20020 	sw	v0,32(s8)
+  4000d8:	afc00018 	sw	zero,24(s8)
+  4000dc:	afc0001c 	sw	zero,28(s8)
+  4000e0:	1000000f 	b	400120 <main+0x70>
+  4000e4:	00000000 	nop
+  4000e8:	8fc30020 	lw	v1,32(s8)
+  4000ec:	8fc20020 	lw	v0,32(s8)
+  4000f0:	24420001 	addiu	v0,v0,1
+  4000f4:	afc20020 	sw	v0,32(s8)
+  4000f8:	8fc40018 	lw	a0,24(s8)
+  4000fc:	00602821 	move	a1,v1
+  400100:	8f99802c 	lw	t9,-32724(gp)
+  400104:	0320f809 	jalr	t9
+  400108:	00000000 	nop
+  40010c:	8fdc0010 	lw	gp,16(s8)
+  400110:	afc20018 	sw	v0,24(s8)
+  400114:	8fc2001c 	lw	v0,28(s8)
+  400118:	24420001 	addiu	v0,v0,1
+  40011c:	afc2001c 	sw	v0,28(s8)
+  400120:	8fc2001c 	lw	v0,28(s8)
+  400124:	28420005 	slti	v0,v0,5
+  400128:	1440ffef 	bnez	v0,4000e8 <main+0x38>
+  40012c:	00000000 	nop
+  400130:	00001021 	move	v0,zero
+  400134:	03c0e821 	move	sp,s8
+  400138:	8fbf002c 	lw	ra,44(sp)
+  40013c:	8fbe0028 	lw	s8,40(sp)
+  400140:	27bd0030 	addiu	sp,sp,48
+  400144:	03e00008 	jr	ra
+  400148:	00000000 	nop
+  40014c:	00000000 	nop
+
+00400150 <add>:
+  400150:	27bdfff8 	addiu	sp,sp,-8
+  400154:	afbe0000 	sw	s8,0(sp)
+  400158:	03a0f021 	move	s8,sp
+  40015c:	afc40008 	sw	a0,8(s8)
+  400160:	afc5000c 	sw	a1,12(s8)
+  400164:	8fc30008 	lw	v1,8(s8)
+  400168:	8fc2000c 	lw	v0,12(s8)
+  40016c:	00621021 	addu	v0,v1,v0
+  400170:	03c0e821 	move	sp,s8
+  400174:	8fbe0000 	lw	s8,0(sp)
+  400178:	27bd0008 	addiu	sp,sp,8
+  40017c:	03e00008 	jr	ra
+  400180:	00000000 	nop
+	...
+Disassembly of section .got:
+
+10000000 <_GLOBAL_OFFSET_TABLE_>:
+10000000:	00000000 	nop
+10000004:	80000000 	lb	zero,0(zero)
+	...
+1000001c:	00400150 	0x400150
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	00474343 	0x474343
+   4:	3a202847 	xori	zero,s1,0x2847
+   8:	4e552920 	c3	0x552920
+   c:	342e302e 	ori	t6,at,0x302e
+  10:	30202844 	andi	zero,at,0x2844
+  14:	454e5820 	0x454e5820
+  18:	454c444b 	0x454c444b
+  1c:	20342e31 	addi	s4,at,11825
+  20:	20342e30 	addi	s4,at,11824
+  24:	2e302900 	sltiu	s0,s1,10496
+  28:	00474343 	0x474343
+  2c:	3a202847 	xori	zero,s1,0x2847
+  30:	4e552920 	c3	0x552920
+  34:	342e302e 	ori	t6,at,0x302e
+  38:	30202844 	andi	zero,at,0x2844
+  3c:	454e5820 	0x454e5820
+  40:	454c444b 	0x454c444b
+  44:	20342e31 	addi	s4,at,11825
+  48:	20342e30 	addi	s4,at,11824
+  4c:	2e302900 	sltiu	s0,s1,10496
+Disassembly of section .pdr:
+
+00000000 <.pdr>:
+   0:	004000b0 	tge	v0,zero,0x2
+   4:	c0000000 	ll	zero,0(zero)
+   8:	fffffffc 	sdc3	$31,-4(ra)
+	...
+  14:	00000030 	tge	zero,zero
+  18:	0000001e 	0x1e
+  1c:	0000001f 	0x1f
+  20:	00400150 	0x400150
+  24:	40000000 	mfc0	zero,c0_index
+  28:	fffffff8 	sdc3	$31,-8(ra)
+	...
+  34:	00000008 	jr	zero
+  38:	0000001e 	0x1e
+  3c:	0000001f 	0x1f
