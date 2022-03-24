@@ -99,10 +99,10 @@ int readelf(u_char *binary, int size)
                 }
         }
 		else if (flag == 1) {
-            printf("Overlay at page va : 0x%x\n", addr);
+            printf("Overlay at page va : 0x%x\n", addr&~4095);
         }
         else {
-            printf("Conflict at page va : 0x%x\n", addr);
+            printf("Conflict at page va : 0x%x\n", addr&~4095);
         }
 		// printf("e_type: %d\n", ehdr->e_type);
         return 0;
