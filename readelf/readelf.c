@@ -76,18 +76,17 @@ int readelf(u_char *binary, int size)
 			phdr = (Elf32_Phdr *)(ptr_ph_table + i * ph_entry_size);
 			Elf32_Addr l_1, r_1, l_2, r_2;
 			l_1 = phdr->p_vaddr;
-			r_1 = l_1 + phdr->p_filesz;
+			r_1 = l_1 + phdr->p_memsz;
 			for ( Elf32_Half j = 0; j < ph_entry_count; j++) {
 				if (i == j) continue;
 				Elf32_Phdr *p = (Elf32_Phdr *)(ptr_ph_table + j * ph_entry_size);
 				l_2 = p->p_vaddr;
-				r_2 = l_2 + p->p_filesz;
+				r_2 = l_2 + p->p_memsz;
 				if (ROUNDDOWN(r_1, BY2PG) == ROUNDDOWN(l_2, BY2PG)) {
 					flag = 1;
 					addr = p->p_vaddr;
 					if (l_2 < r_1) {
 						flag = 2;
-						break;
 					}
 					break;
 				}
@@ -95,8 +94,9 @@ int readelf(u_char *binary, int size)
 		}
 		if (flag == 0) {
             for(i = 0; i < ph_entry_count; i++){
-                    printf("%d:0x%x,0x%x\n", i, phdr->p_filesz, phdr->p_memsz);
-                }
+				phdr = phdr = (Elf32_Phdr *)(ptr_ph_table + i * ph_entry_size);
+                printf("%d:0x%x,0x%x\n", i, phdr->p_filesz, phdr->p_memsz);
+            }
         }
 		else if (flag == 1) {
             printf("Overlay at page va : 0x%x\n", addr&~4095);
