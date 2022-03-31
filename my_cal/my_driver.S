@@ -27,5 +27,5 @@ LEAF(_my_putchar)
 END(_my_putchar)
 
 LEAF(_my_exit)
-	sw t0, 0x10000010(zero)
+	sb t0, 0x10000010(zero)
 END(_my_exit)
