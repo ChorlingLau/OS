@@ -46,11 +46,10 @@ lp_Print(void (*output)(void *, char *, int),
     char c;
     char *s;
     long int num;
-#define SIZE_C 1000
 	typedef struct {
 		int size;
 		char c;
-		int array[SIZE_C];
+		int *array;
 	}my_struct;
 	my_struct *t;
 	
