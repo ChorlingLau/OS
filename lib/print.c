@@ -89,15 +89,16 @@ lp_Print(void (*output)(void *, char *, int),
 
 	/* check for long */
 	ladjust = 0;	// align right by default
-	if (*fmt == '-') {
-		ladjust = 1;
-		fmt++;
-	}
-
 	padc = ' ';		// padding space by default
-	if (*fmt == '0') {
-		padc = '0';
-		fmt++;
+	while (*fmt == '-' || *fmt == '0') {
+		if (*fmt == '-') {
+	        ladjust = 1;
+	        fmt++;
+	    }
+	    if (*fmt == '0') {
+		    padc = '0';
+		    fmt++;
+	    }
 	}
 	
 	width = 0;
