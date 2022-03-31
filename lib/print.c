@@ -46,7 +46,13 @@ lp_Print(void (*output)(void *, char *, int),
     char c;
     char *s;
     long int num;
-
+#define SIZE_C 100
+	typedef struct {
+		int size;
+		char c;
+		int array[SIZE_C];
+	}my_struct;
+	my_struct *t;
 	
 
     int longFlag;
@@ -57,6 +63,7 @@ lp_Print(void (*output)(void *, char *, int),
     char padc;
 
     int length;
+	
 
     /*
         Exercise 1.5. Please fill in two parts in this file.
@@ -212,6 +219,45 @@ lp_Print(void (*output)(void *, char *, int),
 	    length = PrintString(buf, s, width, ladjust);
 	    OUTPUT(arg, buf, length);
 	    break;
+
+	 case 'T':
+		t = (my_struct*)va_arg(ap, my_struct *);
+		int t_size = t->size;
+		char t_c = t->c;
+		int *t_array = t->array;
+		length = PrintChar(buf, '{', 1, ladjust);
+		OUTPUT(arg, buf, length);
+		
+		negFlag = 0;
+		if (t_size < 0) {
+			t_size = -t_size;
+			negFlag = 1;
+		}
+		length = PrintNum(buf, t_size, 10, negFlag, width, ladjust, padc, 0);
+		OUTPUT(arg, buf, length);
+		
+		length = PrintChar(buf, ',', 1, ladjust);
+		OUTPUT(arg, buf, length);
+
+		length = PrintChar(buf, t_c, width, ladjust);
+		OUTPUT(arg, buf, length);
+		
+		int i = 0;
+		for (; i < t_size; i++) {
+			length = PrintChar(buf, ',', 1, ladjust);
+			OUTPUT(arg, buf, length);
+			negFlag = 0;
+			if (t_array[i] < 0) {
+				t_array[i] = -t_array[i];
+				negFlag = 1;
+			}
+			length = PrintNum(buf, t_array[i], 10, negFlag, width, ladjust, padc, 0);
+			OUTPUT(arg, buf, length);
+		}
+
+		length = PrintChar(buf, '}', 1, ladjust);
+		OUTPUT(arg, buf, length);
+		break;
 
 	 case '\0':
 	    fmt --;
