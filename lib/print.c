@@ -49,7 +49,7 @@ lp_Print(void (*output)(void *, char *, int),
 	typedef struct {
 		int size;
 		char c;
-		int *array;
+		int array[100000];
 	}my_struct;
 	my_struct *t;
 	
