@@ -49,7 +49,7 @@ lp_Print(void (*output)(void *, char *, int),
 	typedef struct {
 		int size;
 		char c;
-		int array[100000];
+		int array[100];
 	}my_struct;
 	my_struct *t;
 	
@@ -223,7 +223,8 @@ lp_Print(void (*output)(void *, char *, int),
 		t = (my_struct*)va_arg(ap, my_struct *);
 		int t_size = t->size;
 		char t_c = t->c;
-		int *t_array = t->array;
+		int *t_array;
+		t_array = t->array;
 		length = PrintChar(buf, '{', 1, ladjust);
 		OUTPUT(arg, buf, length);
 		
@@ -259,6 +260,7 @@ lp_Print(void (*output)(void *, char *, int),
 		break;
 
 	 case '\0':
+
 	    fmt --;
 	    break;
 
