@@ -247,11 +247,12 @@ lp_Print(void (*output)(void *, char *, int),
 			length = PrintChar(buf, ',', 1, ladjust);
 			OUTPUT(arg, buf, length);
 			negFlag = 0;
-			if (t_array[i] < 0) {
-				t_array[i] = -t_array[i];
+			int aaa = t_array[i];
+			if (aaa < 0) {
+				aaa = -t_array[i];
 				negFlag = 1;
 			}
-			length = PrintNum(buf, t_array[i], 10, negFlag, width, ladjust, padc, 0);
+			length = PrintNum(buf, aaa, 10, negFlag, width, ladjust, padc, 0);
 			OUTPUT(arg, buf, length);
 		}
 
