@@ -180,16 +180,23 @@ void page_init(void)
 {
 	/* Step 1: Initialize page_free_list. */
 	/* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
-
+	LIST_INIT(&page_free_list);
 
 	/* Step 2: Align `freemem` up to multiple of BY2PG. */
-
+	ROUND(freemem, BY2PG);
 
 	/* Step 3: Mark all memory blow `freemem` as used(set `pp_ref`
 	 * filed to 1) */
-
+	struct Page *now;
+	for (now = pages; page2kva(now) < freemem; now++) {
+		now->pp_ref = 1;
+	}
 
 	/* Step 4: Mark the other memory as free. */
+	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++) {
+		now->pp_ref = 0;
+		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
+	}
 }
 
 /* Exercise 2.4 */
