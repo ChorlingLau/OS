@@ -157,7 +157,7 @@
 				if (LIST_FIRST((head)) == NULL) {													\
 						LIST_INSERT_HEAD((head), (elm), field);										\
 				} else {																			\
-						LIST_NEXT((elm), field) = LIST_HEAD((head));								\
+						LIST_NEXT((elm), field) = LIST_FIRST((head));								\
 						while (LIST_NEXT(LIST_NEXT((elm), field), field) != NULL) {					\
 								LIST_NEXT((elm), field) = LIST_NEXT(LIST_NEXT((elm), field), field);\
 						}																			\
