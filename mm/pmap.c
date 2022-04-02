@@ -238,10 +238,13 @@ When you free a page, just insert it to the page_free_list.*/
 void page_free(struct Page *pp)
 {
 	/* Step 1: If there's still virtual address referring to this page, do nothing. */
-
+	if (pp->pp_ref > 0) return;
 
 	/* Step 2: If the `pp_ref` reaches 0, mark this page as free and return. */
-
+	else if (pp->pp_ref == 0){
+		LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		return;
+	}
 
 	/* If the value of `pp_ref` is less than 0, some error must occurr before,
 	 * so PANIC !!! */
