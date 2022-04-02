@@ -29,7 +29,7 @@ void mips_detect_memory()
 	 * (When use real computer, CMOS tells us how many kilobytes there are). */
 	maxpa = 0x4000000;
 	basemem = 0x4000000;
-	extmen = 0x0;
+	extmem = 0x0;
 
 	// Step 2: Calculate corresponding npage value.
 	npage = basemem >> PGSHIFT;
