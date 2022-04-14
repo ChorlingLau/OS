@@ -263,21 +263,14 @@ void page_free(struct Page *pp)
 	panic("cgh:pp->pp_ref is less than zero\n");
 }
 
-<<<<<<< HEAD
 int page_protect(struct Page *pp) {
-=======
-int page_protect(struct Page *pp){
->>>>>>> lab2-1-exam
+
 	if (pp->pp_protect) {
 		return -2;
 	} else {
 		struct Page *now;
 		for (now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
-<<<<<<< HEAD
 			if (now == pp) {
-=======
-			if (LIST_NEXT(now, pp_link) == pp) {
->>>>>>> lab2-1-exam
 				pp->pp_protect = 1;
 				return 0;
 			}
@@ -292,11 +285,7 @@ int page_status_query(struct Page *pp) {
 	} else {
 		struct Page *now;
 		for (now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
-<<<<<<< HEAD
             if (now == pp) {
-=======
-            if (LIST_NEXT(now, pp_link) == pp) {
->>>>>>> lab2-1-exam
                  return 2;
             }
         }
