@@ -258,6 +258,33 @@ void page_free(struct Page *pp)
 	panic("cgh:pp->pp_ref is less than zero\n");
 }
 
+int page_protest(struct Page *pp) {
+	if (pp->pp_protest) {
+		return -2;
+	} else {
+		for (Page *now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
+			if (LIST_NEXT(now, pp_link) == pp) {
+				pp_protest = 1;
+				return 0;
+			}
+		}
+		return -1;
+	}
+}
+
+int page_status_query(struct Page *pp) {
+	if (pp_protest) {
+		return 3;
+	} else {
+		for (Page *now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
+            if (LIST_NEXT(now, pp_link) == pp) {
+                 return 2;
+            }
+        }
+		return 1;
+	}
+}
+
 /* Exercise 2.8 */
 /*Overview:
   Given `pgdir`, a pointer to a page directory, pgdir_walk returns a pointer
