@@ -6,6 +6,9 @@
 #include "mmu.h"
 #include "printf.h"
 
+void buddy_init(void);
+int buddy_alloc(u_int size, u_int *pa, u_char *pi);
+void buddy_free(u_int pa);
 
 LIST_HEAD(Page_list, Page);
 typedef LIST_ENTRY(Page) Page_LIST_entry_t;

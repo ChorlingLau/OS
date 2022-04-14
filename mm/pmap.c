@@ -18,6 +18,72 @@ static u_long freemem;
 
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
+struct BuddySpace {
+	u_int start_addr;
+	u_int end_addr;
+	struct BuddySpace *next;
+	struct BuddySpace *last;
+};
+
+struct BuddySpace *free_head;
+
+static u_long buddy_startmem;
+static u_long buddy_basemem;
+void buddy_init(void) {
+	buddy_startmem = 0x2000000;
+	buddy_basemem = 0x800000;
+	struct BuddySpace space[4];
+	int i;
+	for (i=0;i<4;i++){
+		space[i].start_addr = 0x2000000 + i*0x800000;
+		space[i].end_addr = 0x2800000 + i*0x800000;
+		if (i) {
+			space[i].last = space[i-1];
+		} else {
+			space[i].last = free_head;
+			free_head = space[i];
+		}
+		if (i==3) {
+			space[i].next = NULL;
+		} else {
+			space[i].next = space[i+1];
+		}
+	}
+}
+
+void buddy_alloc(u_int size, u_int *pa, u_char *pi) {
+	struct BuddySpace space = free_head->next;
+	while(space.end_addr - space.start_addr < size){
+		space = space.next;
+	}
+	while (space.end_addr - space.start_addr > 0x1000 
+		&& space.end_addr - space.start_addr >= 2*size) {
+		
+		struct BuddySpace tmp;
+		tmp.start_addr = space.start_addr;
+		tmp.end_addr = (space.end_addr + space.start_addr)/2;
+		space.start_addr = tmp.end_addr;
+		tmp.next = space;
+		tmp.last = space.last;
+		space.last->next = tmp;
+		space.last = tmp;
+		space = tmp;
+	}
+	&pa = space.start_addr;
+	int temp_i = (space.end_addr - space.start_addr)/0x1000;
+	u_char i=0;
+	while(temp_i) {
+		temp_i/=2;
+		i++;
+	}
+	*pi = i;
+	space.next->last = space.last;
+	space.last->next = space.next;
+}
+
+void buddy_free(u_int pa) {
+	
+}
 
 /* Exercise 2.1 */
 /* Overview:
