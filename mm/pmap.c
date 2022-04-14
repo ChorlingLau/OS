@@ -200,7 +200,7 @@ void page_init(void)
 	}
 
 	/* Step 4: Mark the other memory as free. */
-	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++) {
+	for ( ; page2ppn(now) < npage; now++) {
 		now->pp_ref = 0;
 		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
 	}
@@ -257,6 +257,7 @@ void page_free(struct Page *pp)
 	 * so PANIC !!! */
 	panic("cgh:pp->pp_ref is less than zero\n");
 }
+
 int page_protect(struct Page *pp){
 	if (pp->pp_protect) {
 		return -2;
