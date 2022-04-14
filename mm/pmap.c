@@ -197,11 +197,13 @@ void page_init(void)
 	struct Page *now;
 	for (now = pages; page2kva(now) < freemem; now++) {
 		now->pp_ref = 1;
+		now->pp_protect = 0;
 	}
 
 	/* Step 4: Mark the other memory as free. */
 	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++) {
 		now->pp_ref = 0;
+		now->pp_protect = 0;
 		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
 	}
 }
@@ -258,13 +260,14 @@ void page_free(struct Page *pp)
 	panic("cgh:pp->pp_ref is less than zero\n");
 }
 
-int page_protest(struct Page *pp) {
-	if (pp->pp_protest) {
+int page_protect(struct Page *pp) {
+	if (pp->pp_protect) {
 		return -2;
 	} else {
-		for (Page *now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
-			if (LIST_NEXT(now, pp_link) == pp) {
-				pp_protest = 1;
+		struct Page *now;
+		for (now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
+			if (now == pp) {
+				pp->pp_protect = 1;
 				return 0;
 			}
 		}
@@ -273,11 +276,12 @@ int page_protest(struct Page *pp) {
 }
 
 int page_status_query(struct Page *pp) {
-	if (pp_protest) {
+	if (pp->pp_protect) {
 		return 3;
 	} else {
-		for (Page *now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
-            if (LIST_NEXT(now, pp_link) == pp) {
+		struct Page *now;
+		for (now = LIST_FIRST(&page_free_list); LIST_NEXT(now, pp_link) != NULL; now = LIST_NEXT(now, pp_link)) {
+            if (now == pp) {
                  return 2;
             }
         }

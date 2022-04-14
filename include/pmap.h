@@ -6,8 +6,6 @@
 #include "mmu.h"
 #include "printf.h"
 
-int page_protect(struct Page *pp);
-int page_status_query(struct Page *pp);
 
 LIST_HEAD(Page_list, Page);
 typedef LIST_ENTRY(Page) Page_LIST_entry_t;
@@ -24,6 +22,8 @@ struct Page {
 	int pp_protect;
 };
 
+int page_protect(struct Page *pp);
+int page_status_query(struct Page *pp);
 extern struct Page *pages;
 
 static inline u_long
