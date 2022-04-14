@@ -1,0 +1,120 @@
+[33m[01m[05m[ You are changing the branch: lab2-1-exam ][0m
+Autotest: Begin at Thu Apr 14 14:30:27 CST 2022
+Begin build at Thu Apr 14 14:30:27 CST 2022
+Cleanning the project.................
+
+for d in boot drivers init lib mm;	\
+	do					\
+		make --directory=$d clean; \
+	done; \
+rm -rf *.o *~ gxemul/vmlinux
+make[1]: Entering directory '/usr/src/workdir/boot'
+rm -rf *~ *.o
+make[1]: Leaving directory '/usr/src/workdir/boot'
+make[1]: Entering directory '/usr/src/workdir/drivers'
+for d in gxconsole; \
+	do				\
+		make --directory=$d clean; \
+	done
+make[2]: Entering directory '/usr/src/workdir/drivers/gxconsole'
+rm -rf *.o *~
+make[2]: Leaving directory '/usr/src/workdir/drivers/gxconsole'
+make[1]: Leaving directory '/usr/src/workdir/drivers'
+make[1]: Entering directory '/usr/src/workdir/init'
+rm -rf *~ *.o
+make[1]: Leaving directory '/usr/src/workdir/init'
+make[1]: Entering directory '/usr/src/workdir/lib'
+rm -rf *~ *.o
+make[1]: Leaving directory '/usr/src/workdir/lib'
+make[1]: Entering directory '/usr/src/workdir/mm'
+rm -rf *~ *.o
+make[1]: Leaving directory '/usr/src/workdir/mm'
+
+Building the project..................
+
+make --directory=boot
+make[1]: Entering directory '/usr/src/workdir/boot'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I../include/ -c start.S 
+make[1]: Leaving directory '/usr/src/workdir/boot'
+make --directory=drivers
+make[1]: Entering directory '/usr/src/workdir/drivers'
+make --directory=gxconsole
+make[2]: Entering directory '/usr/src/workdir/drivers/gxconsole'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC   -c -o console.o console.c
+make[2]: Leaving directory '/usr/src/workdir/drivers/gxconsole'
+make[1]: Leaving directory '/usr/src/workdir/drivers'
+make --directory=init
+make[1]: Entering directory '/usr/src/workdir/init'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I../include -c init.c
+In file included from init.c:2:
+../include/pmap.h:9: warning: 'struct Page' declared inside parameter list
+../include/pmap.h:9: warning: its scope is only this definition or declaration, which is probably not what you want
+../include/pmap.h:10: warning: 'struct Page' declared inside parameter list
+init.c: In function 'Page_protect':
+init.c:38: warning: passing argument 1 of 'page_protect' from incompatible pointer type
+init.c: In function 'Page_status_query':
+init.c:48: warning: passing argument 1 of 'page_status_query' from incompatible pointer type
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I../include -c main.c
+In file included from main.c:13:
+../include/pmap.h:9: warning: 'struct Page' declared inside parameter list
+../include/pmap.h:9: warning: its scope is only this definition or declaration, which is probably not what you want
+../include/pmap.h:10: warning: 'struct Page' declared inside parameter list
+make[1]: Leaving directory '/usr/src/workdir/init'
+make --directory=lib
+make[1]: Entering directory '/usr/src/workdir/lib'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I./ -I../ -I../include/ -c print.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I./ -I../ -I../include/ -c printf.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I./ -I../ -I../include/ -c env.c
+In file included from env.c:7:
+../include/pmap.h:9: warning: 'struct Page' declared inside parameter list
+../include/pmap.h:9: warning: its scope is only this definition or declaration, which is probably not what you want
+../include/pmap.h:10: warning: 'struct Page' declared inside parameter list
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I./ -I../ -I../include/ -c genex.S
+genex.S: Assembler messages:
+genex.S:53: Warning: .ent or .aent not in text section.
+genex.S:69: Warning: .end not in text section
+genex.S:75: Warning: .ent or .aent not in text section.
+genex.S:76: Warning: .end not in text section
+genex.S:80: Warning: .ent or .aent not in text section.
+genex.S:146: Warning: .end not in text section
+genex.S:150: Warning: .ent or .aent not in text section.
+genex.S:150: Warning: .end not in text section
+genex.S:151: Warning: .ent or .aent not in text section.
+genex.S:151: Warning: .end not in text section
+make[1]: Leaving directory '/usr/src/workdir/lib'
+make --directory=mm
+make[1]: Entering directory '/usr/src/workdir/mm'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -I./ -I../ -I../include/ -c pmap.c
+In file included from pmap.c:2:
+../include/pmap.h:9: warning: 'struct Page' declared inside parameter list
+../include/pmap.h:9: warning: its scope is only this definition or declaration, which is probably not what you want
+../include/pmap.h:10: warning: 'struct Page' declared inside parameter list
+pmap.c: In function 'boot_pgdir_walk':
+pmap.c:94: warning: unused variable 'pgtable_entry'
+pmap.c:94: warning: unused variable 'pgtable'
+pmap.c: In function 'page_alloc':
+pmap.c:235: warning: passing argument 1 of 'bzero' makes pointer from integer without a cast
+pmap.c: In function 'page_protest':
+pmap.c:262: error: 'struct Page' has no member named 'pp_protest'
+pmap.c:265: error: 'Page' undeclared (first use in this function)
+pmap.c:265: error: (Each undeclared identifier is reported only once
+pmap.c:265: error: for each function it appears in.)
+pmap.c:265: error: 'now' undeclared (first use in this function)
+pmap.c:267: error: 'pp_protest' undeclared (first use in this function)
+pmap.c:273: warning: control reaches end of non-void function
+pmap.c: At top level:
+pmap.c:275: error: conflicting types for 'page_status_query'
+../include/pmap.h:10: error: previous declaration of 'page_status_query' was here
+pmap.c: In function 'page_status_query':
+pmap.c:276: error: 'pp_protest' undeclared (first use in this function)
+pmap.c:279: error: 'Page' undeclared (first use in this function)
+pmap.c:279: error: 'now' undeclared (first use in this function)
+pmap.c:286: warning: control reaches end of non-void function
+make[1]: Leaving directory '/usr/src/workdir/mm'
+make[1]: *** [Makefile:4: pmap.o] Error 1
+make: *** [Makefile:33: mm] Error 2
+
+End build at Thu Apr 14 14:30:32 CST 2022
+[31m[01m[ Other error! ][0m
+[33m[01m[ You got 0 (of 100) this time. Thu Apr 14 14:30:32 CST 2022 ][0m
+Autotest: End at Thu Apr 14 14:30:32 CST 2022
