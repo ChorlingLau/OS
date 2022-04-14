@@ -230,6 +230,9 @@ int page_alloc(struct Page **pp)
 	/* Step 1: Get a page from free memory. If fail, return the error code.*/
 	if (LIST_EMPTY(&page_free_list)) return -E_NO_MEM;
 	ppage_temp = LIST_FIRST(&page_free_list);
+	while(page_status_query(ppage_temp)==3){
+		ppage_temp = LIST_NEXT(ppage_temp, pp_link);
+	}
 	LIST_REMOVE(ppage_temp, pp_link);
 
 	/* Step 2: Initialize this page.
