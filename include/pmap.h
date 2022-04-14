@@ -24,6 +24,10 @@ struct Page {
 
 int page_protect(struct Page *pp);
 int page_status_query(struct Page *pp);
+<<<<<<< HEAD
+=======
+
+>>>>>>> lab2-1-exam
 extern struct Page *pages;
 
 static inline u_long

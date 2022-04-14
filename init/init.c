@@ -3,7 +3,10 @@
 #include <env.h>
 #include <printf.h>
 #include <trap.h>
+<<<<<<< HEAD
 
+=======
+>>>>>>> lab2-1-exam
 static void page_protect_test(){
 	extern struct Page *pages;
 	struct Page *pp;
@@ -25,6 +28,27 @@ void mips_init(){
 	page_protect_test();
 	*((volatile char*)(0xB0000010)) = 0;
 }
+<<<<<<< HEAD
+=======
+//void mips_init()
+//{
+//	printf("init.c:\tmips_init() is called\n");
+
+	// Lab 2 memory management initialization functions
+//	mips_detect_memory();
+//	mips_vm_init();
+//	page_init();
+
+	// physical_memory_manage_check();
+//	page_check();
+
+//	panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+
+//	while (1);
+
+//	panic("init.c:\tend of mips_init() reached!");
+//}
+>>>>>>> lab2-1-exam
 
 void bcopy(const void *src, void *dst, size_t len)
 {
