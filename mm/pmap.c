@@ -26,9 +26,10 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
 	Pte *pgtable_entry;
 	for (i=0;i<0x400;i++){
 		pgdir_entry = pgdir + i;
+		if ((*pgdir_entry & PTE_V) == 0) continue;
 		for(j=0;j<0x400;j++){
 			pgtable_entry = (Pte *)KADDR(PTE_ADDR(*pgdir_entry)) + j;
-			if (pp == pa2page(*pgtable_entry) && (*pgtable_entry & PTE_V)!=0) {
+			if (pp == pa2page(*pgtable_entry) && (*pgtable_entry & PTE_V) != 0) {
 				vpn_buffer[cnt]=(i<<10)+j;
 				cnt++;
 			}
