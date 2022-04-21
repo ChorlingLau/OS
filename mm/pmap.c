@@ -44,7 +44,7 @@ struct Page *page_migrate(Pde *pgdir, struct Page *pp){
 		Pte *pgtable_entry;
 		pgdir_walk(pgdir, va, 0, &pgtable_entry);
 		if (pgtable_entry == 0) continue;
-		u_int perm = 0xfff&(*pgtable_entry);
+		u_int perm = (0xfff&(*pgtable_entry));
 		page_remove(pgdir, va);
 		page_insert(pgdir, tp, va, perm);
 	}
