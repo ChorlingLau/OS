@@ -41,13 +41,14 @@ struct Page *page_migrate(Pde *pgdir, struct Page *pp){
 	int i;
 	for(i=0;i<len;i++){
 		u_long va = vpn_buffer[i]<<12;
-		Pte *pgtable_entry;
+		Pte *pgtable_entry = 0;
 		pgdir_walk(pgdir, va, 0, &pgtable_entry);
 		if (pgtable_entry == 0) continue;
 		u_int perm = (0xfff&(*pgtable_entry));
 		page_remove(pgdir, va);
 		page_insert(pgdir, tp, va, perm);
 	}
+	tp->pp_ref--;
 	return tp;
 }
 
