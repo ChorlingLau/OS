@@ -18,7 +18,24 @@ static u_long freemem;
 
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
-
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
+	int cnt = 0;
+//	u_long pa = page2pa(pp);
+	int i, j;
+	Pde *pgdir_entry;
+	Pte *pgtable_entry;
+	for (i=0;i<0x400;i++){
+		pgdir_entry = pgdir + i;
+		for(j=0;j<0x400;j++){
+			pgtable_entry = (Pte *)KADDR(PTE_ADDR(*pgdir_entry)) + j;
+			if (pp == pa2page(*pgtable_entry)) {
+				vpn_buffer[cnt]=(i<<10)+j;
+				cnt++;
+			}
+		}
+	}
+	return cnt;
+}
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
