@@ -16,7 +16,39 @@ Pde *boot_pgdir;
 struct Page *pages;
 static u_long freemem;
 
-static struct Page_list page_free_list;	/* Free list of physical pages */
+struct Page_list page_free_list;	/* Free list of physical pages */
+struct Page_list fast_page_free_list;
+
+struct Page *page_migrate(Pde *pgdir, struct Page *pp){
+	struct Page_list dst_page_free_list;
+	if (page2pa(pp) < (0x3000000)) {
+		dst_page_free_list = page_free_list;
+	} else {
+		dst_page_free_list = fast_page_free_list;
+	}
+
+	struct Page *tp;
+	if (LIST_EMPTY(&dst_page_free_list)) return -E_NO_MEM;
+    tp = LIST_FIRST(&dst_page_free_list);
+    LIST_REMOVE(tp, pp_link);
+    bzero(page2kva(tp), BY2PG);
+	tp->pp_link = pp->pp_link;
+	tp->pp_ref = pp->pp_ref;
+	
+	int *vpn_buffer;
+	int len = inverted_page_lookup(pgdir, pp, vpn_buffer);
+	int i;
+	for(i=0;i<len;i++){
+		u_long va = vpn_buffer[i]<<12;
+		Pte *pgtable_entry;
+		pgdir_walk(pgdir, va, 0, &pgtable_entry);
+		if (pgtable_entry == 0) continue;
+		u_int perm = 0xfff&(*pgtable_entry);
+		page_remove(pgdir, va);
+		page_insert(pgdir, tp, va, perm);
+	}
+	return tp;
+}
 
 int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
 	int cnt = 0;
@@ -206,7 +238,7 @@ void page_init(void)
 	/* Step 1: Initialize page_free_list. */
 	/* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
 	LIST_INIT(&page_free_list);
-
+	LIST_INIT(&fast_page_free_list);
 	/* Step 2: Align `freemem` up to multiple of BY2PG. */
 	freemem = ROUND(freemem, BY2PG);
 
@@ -220,7 +252,11 @@ void page_init(void)
 	/* Step 4: Mark the other memory as free. */
 	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++) {
 		now->pp_ref = 0;
-		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
+		if (page2pa(now)<0x3000000) {
+			LIST_INSERT_HEAD(&page_free_list, now, pp_link);
+		} else {
+			LIST_INSERT_HEAD(&fast_page_free_list, now, pp_link);
+		}		
 	}
 }
 
@@ -267,7 +303,11 @@ void page_free(struct Page *pp)
 
 	/* Step 2: If the `pp_ref` reaches 0, mark this page as free and return. */
 	else if (pp->pp_ref == 0){
-		LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		if (page2pa(pp)<(0x3000000)) {
+			LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		} else {
+			LIST_INSERT_HEAD(&fast_page_free_list, pp, pp_link);
+		}
 		return;
 	}
 

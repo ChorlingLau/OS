@@ -22,34 +22,31 @@
 //
 //	panic("init.c:\tend of mips_init() reached!");
 //}
-static void inverted_page_lookup_test(){
+static void page_migrate_test(){
 	struct Page *pp;
 	page_alloc(&pp);
 	Pde *pgdir = (Pde*)page2kva(pp);
-	extern struct Page *pages;
-	int a[10], len, i;
-	page_insert(pgdir, pages + 2333, 0x23500000, 0);
-	page_insert(pgdir, pages + 2333, 0x23400000, 0);
-	page_insert(pgdir, pages + 2333, 0x23300000, 0);
-	printf("%d\n", len = inverted_page_lookup(pgdir, pages + 2333, a));
-	for(i = 0;i < len;i++) printf("%x\n", a[i]);
-	page_remove(pgdir, 0x23400000);
-	printf("%d\n", len = inverted_page_lookup(pgdir, pages + 2333, a));
-	for(i = 0;i < len;i++) printf("%x\n", a[i]);
-	page_insert(pgdir, pages + 2334, 0x23300000, 0);
-	printf("%d\n", len = inverted_page_lookup(pgdir, pages + 2333, a));
-	for(i = 0;i < len;i++) printf("%x\n", a[i]);
-	printf("%d\n", len = inverted_page_lookup(pgdir, pages + 2334, a));
-	for(i = 0;i < len;i++) printf("%x\n", a[i]);
+	page_alloc(&pp);
+	page_insert(pgdir, pp, 0x23300000, 0);
+	page_insert(pgdir, pp, 0x23400000, 0);
+	page_insert(pgdir, pp, 0x23500000, 0);
+	pp = page_migrate(pgdir, pp);
+	printf("%d\n", page2ppn(pp));
+	pp = page_migrate(pgdir, pp);
+	printf("%d\n", page2ppn(pp));
 }
 
 void mips_init(){
+	printf("mips_init() is called.\n");
 	mips_detect_memory();
+	printf("successfully run mips_detect_memory().\n");
 	mips_vm_init();
+	printf("successfully run mips_vm_init().\n");
 	page_init();
+	printf("successfully run page_init().\n");
 
-	inverted_page_lookup_test();
-
+	page_migrate_test();
+	printf("successfully run page_migrate_test().\n");
 	*((volatile char*)(0xB0000010)) = 0;
 }
 void bcopy(const void *src, void *dst, size_t len)
