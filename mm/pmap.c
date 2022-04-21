@@ -22,9 +22,9 @@ struct Page_list fast_page_free_list;
 struct Page *page_migrate(Pde *pgdir, struct Page *pp){
 	struct Page_list dst_page_free_list;
 	if (page2pa(pp) < (0x3000000)) {
-		dst_page_free_list = page_free_list;
-	} else {
 		dst_page_free_list = fast_page_free_list;
+	} else {
+		dst_page_free_list = page_free_list;
 	}
 
 	struct Page *tp;
