@@ -32,9 +32,10 @@ struct Page *page_migrate(Pde *pgdir, struct Page *pp){
     tp = LIST_FIRST(&dst_page_free_list);
     LIST_REMOVE(tp, pp_link);
     bzero(page2kva(tp), BY2PG);
-	tp->pp_link = pp->pp_link;
-	tp->pp_ref = pp->pp_ref;
-	
+//	tp->pp_link = pp->pp_link;
+//	tp->pp_ref = pp->pp_ref;
+	*tp = *pp;
+
 	int *vpn_buffer;
 	int len = inverted_page_lookup(pgdir, pp, vpn_buffer);
 	int i;
