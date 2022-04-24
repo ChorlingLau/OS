@@ -202,6 +202,7 @@ void page_init(void)
 	/* Step 4: Mark the other memory as free. */
 	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++) {
 		now->pp_ref = 0;
+		if (now == TIMESTACK) continue;
 		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
 	}
 }
