@@ -14,13 +14,49 @@ struct Env *curenv = NULL;            // the current env
 
 static struct Env_list env_free_list;    // Free list
 struct Env_list env_sched_list[2];      // Runnable list
- 
+static struct Env_list env_wait_list;	// Waiting list
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
+static int signal[2] = {0};
 
+void S_init(int s, int num) {
+	signal[s-1] = num;
+}
 
+int P(struct Env* e, int s) {
+	if (e->env_wait_status == 1) {
+		return -1;
+	}
+	if (signal[s-1] > 0) {
+		signal[s-1]--;
+		if (e->env_wait_status == 1) {
+			LIST_REMOVE(e, env_wait_link);
+        }
+		e->env_wait_status = 2;
+	} else {
+		e->env_wait_status = 1;
+		LIST_INSERT_TAIL(&env_wait_list, e, env_wait_link);
+	}
+	return 0;
+}
+
+int V(struct Env* e, int s) {
+	if (e->env_wait_status == 1) {
+        return -1;
+    }
+	e->env_wait_status = 3;
+	signal[s-1]++;
+	if (LIST_EMPTY(&env_wait_list)) {
+		return 0; 
+	}
+	struct Env *new = LIST_FIRST(&env_wait_list);
+	signal[s-1]--;
+	new->env_wait_status = 2;
+	LIST_REMOVE(new, env_wait_link);
+	return 0;
+}
 /* Overview:
  *  This function is to allocate an unused ASID
  *
@@ -138,6 +174,7 @@ env_init(void)
 	LIST_INIT(&env_free_list);
 	LIST_INIT(&env_sched_list[0]);
 	LIST_INIT(&env_sched_list[1]);
+	LIST_INIT(&env_wait_list);
 
     /* Step 2: Traverse the elements of 'envs' array,
      *   set their status as free and insert them into the env_free_list.
@@ -242,6 +279,7 @@ env_alloc(struct Env **new, u_int parent_id)
 	e->env_status = ENV_RUNNABLE;
 	e->env_parent_id = parent_id;
 	e->env_runs = 0;
+	e->env_wait_status = 3;
     /* Step 4: Focus on initializing the sp register and cp0_status of env_tf field, located at this new Env. */
     e->env_tf.cp0_status = 0x10001004;
 	e->env_tf.regs[29] = USTACKTOP;	

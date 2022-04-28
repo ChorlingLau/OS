@@ -42,6 +42,8 @@ struct Env {
 	// Lab 6 scheduler counts
 	u_int env_runs;			// number of times been env_run'ed
 	u_int env_nop;                  // align to avoid mul instruction
+	u_int env_wait_status;
+	LIST_ENTRY(Env) env_wait_link;
 };
 
 LIST_HEAD(Env_list, Env);
@@ -58,7 +60,11 @@ void env_destroy(struct Env *e);
 
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 void env_run(struct Env *e);
-
+void S_init(int s, int num);
+int P(struct Env* e, int s);
+int V(struct Env* e, int s);
+int get_status(struct Env* e);
+int my_env_create();
 
 // for the grading script
 #define ENV_CREATE2(x, y) \
