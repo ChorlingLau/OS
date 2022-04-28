@@ -20,17 +20,7 @@ extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
 
-
-/* Overview:
- *  This function is to allocate an unused ASID
- *
- * Pre-Condition:
- *  the number of running processes should be less than 64
- *
- * Post-Condition:
- *  return the allocated ASID on success
- *  panic when too many processes are running
- */
+static u_int edition = 0;
 static u_int asid_alloc() {
     int i, index, inner;
     for (i = 0; i < 64; ++i) {
@@ -43,6 +33,74 @@ static u_int asid_alloc() {
     }
     panic("too many processes!");
 }
+static void asid_free(u_int i) {
+    int index, inner;
+    index = i >> 5;
+    inner = i & 31;
+    asid_bitmap[index] &= ~(1 << inner);
+}
+u_int exam_env_run(struct Env *e) {
+	if ((e->env_asid >> 6) == edition) {
+		//printf("1, %d\n", e->env_asid);
+		return 0;
+	}
+
+	int i = e->env_asid & 0x3f;
+	int index = i >> 5;
+	int inner = i & 31;
+	if ((asid_bitmap[index] & (1 << inner)) == 0) {
+		asid_bitmap[index] |= 1 << inner;
+		e->env_asid = (edition << 6) | i;
+		//printf("2, %d\n", e->env_asid);
+		return 0;
+	} else {
+		for (i = 0; i < 64; ++i) {
+	        index = i >> 5;
+	        inner = i & 31;
+	        if ((asid_bitmap[index] & (1 << inner)) == 0) {
+		        asid_bitmap[index] |= 1 << inner;
+			    e->env_asid = (edition << 6) | i;
+				//printf("3, %d\n", e->env_asid);
+				return 0;
+		    }
+		}
+		edition++;
+		asid_bitmap[0] = 0;
+		asid_bitmap[1] = 0;
+		i = 0;
+		asid_bitmap[0] |= 1;
+		e->env_asid = (edition << 6) | i;
+		//printf("4, %d\n", e->env_asid);
+		return 1;
+	}
+}
+
+void exam_env_free(struct Env *e) {
+	if ((e->env_asid >> 6) != edition) return;
+	asid_free(e->env_asid & 0x3f);
+}
+/* Overview:
+ *  This function is to allocate an unused ASID
+ *
+ * Pre-Condition:
+ *  the number of running processes should be less than 64
+ *
+ * Post-Condition:
+ *  return the allocated ASID on success
+ *  panic when too many processes are running
+ */
+//static u_int asid_alloc() {
+//    int i, index, inner;
+//    for (i = 0; i < 64; ++i) {
+//        index = i >> 5;
+//        inner = i & 31;
+//        if ((asid_bitmap[index] & (1 << inner)) == 0) {
+//            asid_bitmap[index] |= 1 << inner;
+//            return i;
+//        }
+//    }
+//    panic("too many processes!");
+//}
 
 /* Overview:
  *  When a process is killed, free its ASID
@@ -50,12 +108,12 @@ static u_int asid_alloc() {
  * Post-Condition:
  *  ASID is free and can be allocated again later
  */
-static void asid_free(u_int i) {
-    int index, inner;
-    index = i >> 5;
-    inner = i & 31;
-    asid_bitmap[index] &= ~(1 << inner);
-}
+//static void asid_free(u_int i) {
+//    int index, inner;
+//    index = i >> 5;
+//    inner = i & 31;
+//    asid_bitmap[index] &= ~(1 << inner);
+//}
 
 /* Overview:
  *  This function is to make a unique ID for every env
@@ -66,10 +124,19 @@ static void asid_free(u_int i) {
  * Post-Condition:
  *  return e's envid on success
  */
-u_int mkenvid(struct Env *e) {
-    u_int idx = e - envs;
-    u_int asid = asid_alloc();
-    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+//u_int mkenvid(struct Env *e) {
+//    u_int idx = e - envs;
+//    u_int asid = asid_alloc();
+//    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+//}
+u_int mkenvid(struct Env *e)
+{
+    /*Hint: lower bits of envid hold e's position in the envs array. */
+    u_int idx = (u_int)e - (u_int)envs;
+    idx /= sizeof(struct Env);
+
+    /*Hint: avoid envid being zero. */
+    return (1 << (LOG2NENV)) | idx;  //LOG2NENV=10
 }
 
 /* Overview:
@@ -132,7 +199,9 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
 void
 env_init(void)
 {
-
+	edition = 0x4;
+	asid_bitmap[0] = 0;
+    asid_bitmap[1] = 0;
 	int i;
     /* Step 1: Initialize env_free_list. */
 	LIST_INIT(&env_free_list);
@@ -242,6 +311,7 @@ env_alloc(struct Env **new, u_int parent_id)
 	e->env_status = ENV_RUNNABLE;
 	e->env_parent_id = parent_id;
 	e->env_runs = 0;
+	e->env_asid = 0;
     /* Step 4: Focus on initializing the sp register and cp0_status of env_tf field, located at this new Env. */
     e->env_tf.cp0_status = 0x10001004;
 	e->env_tf.regs[29] = USTACKTOP;	
