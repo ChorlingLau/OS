@@ -63,15 +63,15 @@ int V(struct Env* e, int s) {
 
 int get_status(struct Env* e) {
 	int b = e->env_wait_status;
-	if (b == 1) return 1;
-	else {
-		if (e->env_res == 0) {
-			return 3;
-		} else {
-			return 2;
-		}
-	}
-	//return e->env_wait_status;
+//	if (b == 1) return 1;
+//	else {
+//		if (e->env_res == 0) {
+//			return 3;
+//		} else {
+//			return 2;
+//		}
+//	}
+	return e->env_wait_status;
 }
 
 int my_env_create() {
