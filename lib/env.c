@@ -57,6 +57,24 @@ int V(struct Env* e, int s) {
 	LIST_REMOVE(new, env_wait_link);
 	return 0;
 }
+
+int get_status(struct Env* e) {
+	return e->env_wait_status;
+}
+
+int my_env_create() {
+	struct Env *e;
+    /* Step 1: Use env_alloc to alloc a new env. */
+    if (env_alloc(&e, 0)) return;
+    /* Step 2: assign priority to the new env. */
+    //e->env_pri = priority;
+    /* Step 3: Use load_icode() to load the named elf binary,
+       and insert it into env_sched_list using LIST_INSERT_HEAD. */
+    //load_icode(e, binary, size);
+    //LIST_INSERT_HEAD(&env_sched_list[0], e, env_sched_link);
+	e->env_wait_status = 3;
+	return e->env_id;
+}
 /* Overview:
  *  This function is to allocate an unused ASID
  *
