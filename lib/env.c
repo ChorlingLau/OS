@@ -14,7 +14,7 @@ struct Env *curenv = NULL;            // the current env
 
 static struct Env_list env_free_list;    // Free list
 struct Env_list env_sched_list[2];      // Runnable list
-static struct Env_list env_wait_list;	// Waiting list
+static struct Env_list env_wait_list[2];	// Waiting list
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
 
@@ -35,7 +35,7 @@ int P(struct Env* e, int s) {
 		e->env_wait_status = 2;
 	} else {
 		e->env_wait_status = 1;
-		LIST_INSERT_TAIL(&env_wait_list, e, env_wait_link);
+		LIST_INSERT_TAIL(&env_wait_list[s-1], e, env_wait_link);
 	}
 	return 0;
 }
@@ -50,10 +50,10 @@ int V(struct Env* e, int s) {
 	if (e->env_res == 0) e->env_wait_status = 3;
 	else e->env_wait_status = 2;
 	
-	if (LIST_EMPTY(&env_wait_list)) {
+	if (LIST_EMPTY(&env_wait_list[s-1])) {
 		return 0; 
 	}
-	struct Env *new = LIST_FIRST(&env_wait_list);
+	struct Env *new = LIST_FIRST(&env_wait_list[s-1]);
 	signal[s-1]--;
 	new->env_res++;
 	new->env_wait_status = 2;
@@ -196,7 +196,8 @@ env_init(void)
 	LIST_INIT(&env_free_list);
 	LIST_INIT(&env_sched_list[0]);
 	LIST_INIT(&env_sched_list[1]);
-	LIST_INIT(&env_wait_list);
+	LIST_INIT(&env_wait_list[0]);
+	LIST_INIT(&env_wait_list[1]);
 
     /* Step 2: Traverse the elements of 'envs' array,
      *   set their status as free and insert them into the env_free_list.
