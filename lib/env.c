@@ -45,9 +45,9 @@ int V(struct Env* e, int s) {
         return -1;
     }
 	signal[s-1]++;
-	e->env_res--;
-	if (e->env_res < 0) e->env_res = 0;
-	if (e->env_res) e->env_wait_status = 2;
+	if (e->env_res > 0) e->env_res--;
+
+	if (e->env_res > 0) e->env_wait_status = 2;
 	else e->env_wait_status = 3;
 	if (LIST_EMPTY(&env_wait_list)) {
 		return 0; 
