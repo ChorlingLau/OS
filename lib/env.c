@@ -44,7 +44,6 @@ int V(struct Env* e, int s) {
 	if (e->env_wait_status == 1) {
         return -1;
     }
-	signal[s-1]++;
 	if (e->env_res > 0) e->env_res--;
 
 	if (e->env_res == 0) e->env_wait_status = 3;
@@ -52,10 +51,10 @@ int V(struct Env* e, int s) {
 	else e->env_wait_status = 0;
 	
 	if (LIST_EMPTY(&env_wait_list[s-1])) {
+		signal[s-1]++;
 		return 0; 
 	}
 	struct Env *new = LIST_FIRST(&env_wait_list[s-1]);
-	signal[s-1]--;
 	new->env_res++;
 	new->env_wait_status = 2;
 	LIST_REMOVE(new, env_wait_link);
