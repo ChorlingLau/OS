@@ -31,9 +31,7 @@ int P(struct Env* e, int s) {
 	}
 	if (signal[s-1] > 0) {
 		signal[s-1]--;
-		if (e->env_wait_status == 1) {
-			LIST_REMOVE(e, env_wait_link);
-        }
+		e->env_res++;
 		e->env_wait_status = 2;
 	} else {
 		e->env_wait_status = 1;
@@ -46,13 +44,16 @@ int V(struct Env* e, int s) {
 	if (e->env_wait_status == 1) {
         return -1;
     }
-	e->env_wait_status = 3;
 	signal[s-1]++;
+	e->env_res--;
+	if (e->env_res) e->env_wait_status = 2;
+	else e->env_wait_status = 3;
 	if (LIST_EMPTY(&env_wait_list)) {
 		return 0; 
 	}
 	struct Env *new = LIST_FIRST(&env_wait_list);
 	signal[s-1]--;
+	new->env_res++;
 	new->env_wait_status = 2;
 	LIST_REMOVE(new, env_wait_link);
 	return 0;
@@ -73,6 +74,7 @@ int my_env_create() {
     //load_icode(e, binary, size);
     //LIST_INSERT_HEAD(&env_sched_list[0], e, env_sched_link);
 	e->env_wait_status = 3;
+	e->env_res = 0;
 	return e->env_id;
 }
 /* Overview:

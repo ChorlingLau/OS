@@ -43,6 +43,7 @@ struct Env {
 	u_int env_runs;			// number of times been env_run'ed
 	u_int env_nop;                  // align to avoid mul instruction
 	u_int env_wait_status;
+	u_int env_res;
 	LIST_ENTRY(Env) env_wait_link;
 };
 
