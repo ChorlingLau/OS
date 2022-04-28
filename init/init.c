@@ -22,6 +22,8 @@ void pv_check() {
 	printf("%d\n", P(e1, 2));
 	printf("%d\n", V(e1, 1));
 	printf("%d\n", V(e1, 2));
+	printf("%d\n", V(e1, 2));
+//	printf("%d\n", P(e1, 2));
 	printf("envid: %d, status: %d\n", e1->env_id, get_status(e1));
 }
 
