@@ -48,7 +48,8 @@ int V(struct Env* e, int s) {
 	if (e->env_res > 0) e->env_res--;
 
 	if (e->env_res == 0) e->env_wait_status = 3;
-	else e->env_wait_status = 2;
+	else if (e->env_res > 0) e->env_wait_status = 2;
+	else e->env_wait_status = 0;
 	
 	if (LIST_EMPTY(&env_wait_list[s-1])) {
 		return 0; 
@@ -84,7 +85,7 @@ int my_env_create() {
        and insert it into env_sched_list using LIST_INSERT_HEAD. */
     //load_icode(e, binary, size);
     //LIST_INSERT_HEAD(&env_sched_list[0], e, env_sched_link);
-	e->env_wait_status =0;
+	e->env_wait_status = 3;
 	e->env_res = 0;
 	return e->env_id;
 }
