@@ -18,7 +18,7 @@ struct Env_list env_sched_list[2];      // Runnable list
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
 
-static u_int asid_bitmap[2] = {0}; // 64
+static u_int asid_bitmap[2] = {0};	// 64
 
 
 /* Overview:
