@@ -147,10 +147,10 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	struct Page *ppage;
 	int ret;
 	ret = 0;
-	if (va >= UTOP || (perm & PTE_COW) || !(perm & PTE_v)) return -E_INVAL;
+	if (va >= UTOP || (perm & PTE_COW) || !(perm & PTE_V)) return -E_INVAL;
 	if ((ret = envid2env(envid, &env, 1)) < 0) return ret;
 	if ((ret = page_alloc(&ppage)) < 0) return ret;
-	if ((ret = page_insert(env->pgdir, ppage, va, perm)) < 0) return ret;
+	if ((ret = page_insert(env->env_pgdir, ppage, va, perm)) < 0) return ret;
 }
 
 /* Overview:
@@ -344,13 +344,13 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	struct Env *e;
 	struct Page *p;
 	
-	if (dstva >= UTOP) {
-        panic("sys_ipc_can_send dstva is out of range!");
+	if (srcva >= UTOP) {
+        panic("sys_ipc_can_send srcva is out of range!");
         return ;
     }
 	if ((r = envid2env(envid, &e, 0)) < 0) return r;
-	if (!e->env_ipc_receiving) return -E_IPC_NOT_RECV;
-	e->env_ipc_receiving = 0;
+	if (!e->env_ipc_recving) return -E_IPC_NOT_RECV;
+	e->env_ipc_recving = 0;
 	e->env_ipc_perm = perm;
 	e->env_ipc_from = curenv->env_id;
 	e->env_ipc_value = value;
