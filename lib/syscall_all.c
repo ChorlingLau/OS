@@ -234,8 +234,7 @@ int sys_env_alloc(void)
 	int r;
 	struct Env *e;
 	if ((r = env_alloc(&e, curenv->env_id)) < 0) return r;
-	bcopy((void *) (KERNEL_SP - sizeof(struct Trapframe)),
-		  &(e->env_tf),
+	bcopy((void *) (KERNEL_SP - sizeof(struct Trapframe)), &(e->env_tf),
 		  sizeof(struct Trapframe));
 	e->env_tf.pc = e->env_tf.cp0_epc;
 	e->env_tf.regs[2] = 0;	// $v0, return value should be set to 0 because this is a child env

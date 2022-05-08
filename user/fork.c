@@ -173,11 +173,12 @@ fork(void)
 		return 0;
 	}
 
-	for (i = 0; i< VPN(USTACKTOP); i++) {
-		if ((*vpt)[i >> 10] && (*vpt)[i]) {
+	for (i = 0; i < VPN(USTACKTOP); i++) {
+		if ((((Pde *)(*vpt))[i] & PTE_V) && (((Pte *)(*vpt))[i]) & PTE_V) {
 			duppage(newenvid, i);
 		}
 	}
+
 	if (syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, (PTE_V | PTE_R)) < 0) {
 		user_panic("user/fork.c/fork -- syscall_mem_alloc failed!");
 		return -1;

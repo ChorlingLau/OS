@@ -316,7 +316,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
             size = MIN(BY2PG, sgsize - i);
             start = page2kva(p);
         }
-        bzero((void *)start, size);
+        //bzero((void *)start, size);
 		i += size;
     }
     return 0;
