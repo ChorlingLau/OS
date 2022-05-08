@@ -132,13 +132,21 @@ duppage(u_int envid, u_int pn)
 	u_int perm;
 	addr = pn * BY2PG;
 	perm = (*vpt)[pn] & 0xfff;
+//	writef("duppage start -------\n");
 	if (!(perm & PTE_V) || !(perm & PTE_R) || (perm & PTE_COW) || (perm & PTE_LIBRARY)) {
-		syscall_mem_map(0, addr, envid, addr, perm);
-	} else if (perm & PTE_R){
+		if (syscall_mem_map(0, addr, envid, addr, perm) < 0) {
+			user_panic("user/fork.c/duppage -- syscall_mem_map1 failed!");
+		}
+	} else if (perm & PTE_R) {
 		perm = perm | PTE_COW;
-		syscall_mem_map(0, addr, envid, addr, perm);	// child
-		syscall_mem_map(0, addr, 0, addr, perm);		// parent
+		if (syscall_mem_map(0, addr, envid, addr, perm) < 0) {	// child
+            user_panic("user/fork.c/duppage -- syscall_mem_map2 failed!");
+        }
+		if (syscall_mem_map(0, addr, 0, addr, perm) < 0) {		// parent
+            user_panic("user/fork.c/duppage -- syscall_mem_map failed!");
+        }
 	}
+//	writef("duppage end -------\n");
 	//	user_panic("duppage not implemented");
 }
 
@@ -168,13 +176,14 @@ fork(void)
 	//alloc a new alloc
 	newenvid = syscall_env_alloc();
 	if (newenvid == 0) {	// child
+		// writef("son!\n");
 		env = &envs[ENVX(syscall_getenvid())];
 		env->env_parent_id = parent_id;
 		return 0;
 	}
 
 	for (i = 0; i < VPN(USTACKTOP); i++) {
-		if ((((Pde *)(*vpt))[i] & PTE_V) && (((Pte *)(*vpt))[i]) & PTE_V) {
+		if ((((Pde *)(*vpd))[i >> 10] & PTE_V) && (((Pte *)(*vpt))[i] & PTE_V)) {
 			duppage(newenvid, i);
 		}
 	}
