@@ -82,17 +82,30 @@ void user_bzero(void *v, u_int n)
 static void
 pgfault(u_int va)
 {
-	u_int *tmp;
+	u_int *tmp = (u_int *)USTACKTOP;
+	va = ROUNDDOWN(va, BY2PG);
 	//	writef("fork.c:pgfault():\t va:%x\n",va);
-
+	if (((*vpt)[VPN(va)] & PTE_COW) == 0) {
+		user_panic("user/fork.c/pgfault -- not PTE_COW!");
+		return;
+	}
 	//map the new page at a temporary place
-
+	if (syscall_mem_alloc(0, tmp, (PTE_V | PTE_R)) < 0) {
+		user_panic("user/fork.c/pgfault -- syscall_mem_alloc failed!");
+		return;
+	}
 	//copy the content
-
+	user_bcopy((void *)va, (void *)tmp, BY2PG);
 	//map the page on the appropriate place
-
+	if (syscall_mem_map(0, tmp, 0, va, (PTE_V | PTE_R)) < 0) {
+		user_panic("user/fork.c/pgfault -- syscall_mem_map failed!");
+        return;
+	}
 	//unmap the temporary place
-
+	if (syscall_mem_unmap(0, tmp) < 0) {
+		user_panic("user/fork.c/pgfault -- syscall_mem_unmap failed!");
+        return;
+	}
 }
 
 /* Overview:
@@ -117,7 +130,15 @@ duppage(u_int envid, u_int pn)
 {
 	u_int addr;
 	u_int perm;
-
+	addr = pn * BY2PG;
+	perm = (*vpt)[pn] & 0xfff;
+	if (!(perm & PTE_V) || !(perm & PTE_R) || (perm & PTE_COW) || (perm & PTE_LIBRARY)) {
+		syscall_mem_map(0, addr, envid, addr, perm);
+	} else if (perm & PTE_R){
+		perm = perm | PTE_COW;
+		syscall_mem_map(0, addr, envid, addr, perm);	// child
+		syscall_mem_map(0, addr, 0, addr, perm);		// parent
+	}
 	//	user_panic("duppage not implemented");
 }
 
@@ -140,20 +161,31 @@ fork(void)
 	extern struct Env *envs;
 	extern struct Env *env;
 	u_int i;
-
+	u_int parent_id = syscall_getenvid();
 
 	//The parent installs pgfault using set_pgfault_handler
-
+	set_pgfault_handler(pgfault);
 	//alloc a new alloc
+	newenvid = syscall_env_alloc();
+	if (newenvid == 0) {	// child
+		env = &envs[ENVX(syscall_getenvid())];
+		env->env_parent_id = parent_id;
+		return 0;
+	}
 
-
+	for (i = 0; i< VPN(USTACKTOP); i++) {
+		if ((*vpt)[i >> 10] && (*vpt)[i]) {
+			duppage(newenvid, i);
+		}
+	}
+	if (syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, (PTE_V | PTE_R)) < 0) {
+		user_panic("user/fork.c/fork -- syscall_mem_alloc failed!");
+		return -1;
+	}
+	if (syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP) < 0) {
+		user_panic("user/fork.c/fork -- syscall_set_pgfault_handler failed!");
+        return -1;
+	}
+	syscall_set_env_status(newenvid, ENV_RUNNABLE);
 	return newenvid;
-}
-
-// Challenge!
-int
-sfork(void)
-{
-	user_panic("sfork not implemented");
-	return -E_INVAL;
 }
