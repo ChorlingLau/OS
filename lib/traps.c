@@ -6,6 +6,7 @@ extern void handle_int();
 extern void handle_reserved();
 extern void handle_tlb();
 extern void handle_sys();
+extern void handle_adel();
 extern void handle_mod();
 unsigned long exception_handlers[32];
 void trap_init(){
@@ -16,6 +17,7 @@ void trap_init(){
 	set_except_vector(1, handle_mod);
 	set_except_vector(2, handle_tlb);
 	set_except_vector(3, handle_tlb);
+	set_except_vector(4, handle_adel);
 	set_except_vector(8, handle_sys);
 }
 void *set_except_vector(int n, void * addr){
@@ -70,5 +72,26 @@ page_fault_handler(struct Trapframe *tf)
 	tf->cp0_epc = curenv->env_pgfault_handler;
 	
 	
+	return;
+}
+
+void address_handler(struct Trapframe *tf) {
+	extern struct Env *curenv;
+//	struct Trapframe *AdTrapFrame;
+//	bcopy(tf, &AdTrapFrame,sizeof(struct Trapframe));
+//	printf("epc addr is %08x\n", tf->cp0_epc);
+//	printf("pc addr is %08x\n", tf->pc);
+	u_int *epc = tf->cp0_epc;
+	u_int instr = *epc;
+//	printf("instr is %08x\n", instr);
+	if ((instr & 0x8c000000) == 0x8c000000) {
+		instr = instr & ~0x08000000;
+	} else if ((instr & 0x84000000) == 0x84000000) {
+		instr = instr & ~0x04000000;
+	} else {
+		printf("not lw or lh! %08x\n", instr);
+	}
+	*epc = instr;
+	tf->cp0_epc = (unsigned long) epc;
 	return;
 }
