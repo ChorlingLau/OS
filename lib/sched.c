@@ -14,7 +14,8 @@
 /*** exercise 3.15 ***/
 void sched_yield(void)
 {
-    static int count = 0; // remaining time slices of current env
+    printf("\n");
+	static int count = 0; // remaining time slices of current env
     static int point = 0; // current env_sched_list index
     
     /*  hint:
@@ -35,14 +36,24 @@ void sched_yield(void)
 		if (e) {
 			LIST_REMOVE(e, env_sched_link);
 			if (e->env_status != ENV_FREE) {
-				LIST_INSERT_TAIL(&env_sched_list[1 - point], e, env_sched_link);
+				if (e->env_pri % 2 == 1) {
+					LIST_INSERT_TAIL(&env_sched_list[(point+1)%3], e, env_sched_link);
+				} else {
+					LIST_INSERT_TAIL(&env_sched_list[(point+2)%3], e, env_sched_link);
+				}
 			}
 		}
-		if (LIST_EMPTY(&env_sched_list[point])) point = 1 - point;
+		if (LIST_EMPTY(&env_sched_list[point])) point = (point+1)%3;
         if (LIST_EMPTY(&env_sched_list[point])) continue;
         e = LIST_FIRST(&env_sched_list[point]);
         if (e) {
-			count = e->env_pri;
+			if (point == 0) {
+				count = e->env_pri;
+			} else if (point == 1) {
+				count = e->env_pri * 2;
+			} else {
+				count = e->env_pri * 4;
+			}
 		}
 	}
 	count--;
