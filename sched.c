@@ -69,7 +69,7 @@ void SJF (
     const int job_required_time [],
     int job_sched_start []
 ) {
-	int cnt = 0, i = 0, time = 0;
+/*	int cnt = 0, i = 0, time = 0;
 	jobs[i].id = i;
     jobs[i].submit = job_submitted_time[i];
     jobs[i].require = job_required_time[i];
@@ -97,5 +97,23 @@ void SJF (
 	//		printf("%d ", jobs[tmp].id);
 	//	}
 	//	printf("\n");
+	}*/
+	int next = 0, i = 0, time = job_submitted_time[0];
+	int flag[2005] = {0};
+	for (i = 0; i < number_of_jobs; i++) {
+		int j = 0;
+		while (flag[j]) j++;
+		next = j;
+		if (time <= job_submitted_time[next]) {
+            time = job_submitted_time[next];
+        }
+		for (j++; j < number_of_jobs && job_submitted_time[j] <= time; j++) {
+			if (flag[j]) continue;
+			if (job_required_time[j] < job_required_time[next]) next = j;
+		}
+		if (time <= job_submitted_time[next]) time = job_submitted_time[next];
+		job_sched_start[next] = time;
+        time += job_required_time[next];
+		flag[next] = 1;
 	}
 }
