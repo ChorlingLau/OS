@@ -64,8 +64,8 @@ u_int sys_getenvid(void)
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
-	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
-          (void *)TIMESTACK - sizeof(struct Trapframe),
+	bcopy((void *)(KERNEL_SP - sizeof(struct Trapframe)),
+          (void *)(TIMESTACK - sizeof(struct Trapframe)),
 		  sizeof(struct Trapframe));
 	sched_yield();
 }
@@ -186,8 +186,8 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 
     //your code here
 	if (round_srcva >= UTOP || round_dstva >= UTOP || !(perm & PTE_V)) return -E_INVAL;
-	if ((ret = envid2env(srcid, &srcenv, 1)) < 0) return ret;
-	if ((ret = envid2env(dstid, &dstenv, 1)) < 0) return ret;
+	if ((ret = envid2env(srcid, &srcenv, 0)) < 0) return ret;
+	if ((ret = envid2env(dstid, &dstenv, 0)) < 0) return ret;
 	if ((ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte)) == NULL) return -E_INVAL;
 	if (((*ppte & PTE_R) == 0) && ((perm & PTE_R) == 1)) return -E_INVAL;
 	if ((ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm)) < 0) return ret;
