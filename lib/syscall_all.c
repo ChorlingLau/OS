@@ -370,7 +370,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	e->env_status = ENV_RUNNABLE;
 	if (srcva) {
 		Pte *tmp;
-		if ((p = page_looup(curenv->env_pgdir, srcva, &tmp)) == NULL) return -E_IPC_NOT_RECV;
+		if ((p = page_lookup(curenv->env_pgdir, srcva, &tmp)) == NULL) return -E_IPC_NOT_RECV;
 		if ((r = page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm)) < 0) return r;
 	}
 	return 0;
