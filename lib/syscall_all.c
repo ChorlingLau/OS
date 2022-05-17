@@ -64,8 +64,8 @@ u_int sys_getenvid(void)
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
-	bcopy((void *)(KERNEL_SP - sizeof(struct Trapframe)),
-          (void *)(TIMESTACK - sizeof(struct Trapframe)),
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
+          (void *)TIMESTACK - sizeof(struct Trapframe),
 		  sizeof(struct Trapframe));
 	sched_yield();
 }
@@ -152,6 +152,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	if ((ret = envid2env(envid, &env, 1)) < 0) return ret;
 	if ((ret = page_alloc(&ppage)) < 0) return ret;
 	if ((ret = page_insert(env->env_pgdir, ppage, va, perm)) < 0) return ret;
+	return ret;
 }
 
 /* Overview:
