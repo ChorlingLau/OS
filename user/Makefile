@@ -19,7 +19,7 @@ CFLAGS += -nostdlib -static
 
 all: tltest.x tltest.b \
 	fktest.x fktest.b pingpong.x pingpong.b idle.x \
-	$(USERLIB) entry.o syscall_wrap.o
+	$(USERLIB) entry.o syscall_wrap.o ipcsend.x ipcsend.b ipcrecv.x ipcrecv.b
 
 %.x: %.b.c
 	echo cc1 $<

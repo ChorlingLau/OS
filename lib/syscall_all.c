@@ -306,6 +306,16 @@ void sys_panic(int sysno, char *msg)
 	panic("%s", TRUP(msg));
 }
 
+struct MSG {
+	int sender;
+	int recver;
+	int value;
+	int srcva;
+	int perm;
+	int over;
+};
+struct MSG msg[30][100];	// msg[i] are i's recving meg
+int recv_index[30];			// recv_index[i] = envid
 /* Overview:
  * 	This function enables caller to receive message from
  * other process. To be more specific, it will flag
@@ -322,14 +332,43 @@ void sys_panic(int sysno, char *msg)
 /*** exercise 4.7 ***/
 void sys_ipc_recv(int sysno, u_int dstva)
 {
+	int r;
+	struct Env *e;
+	int envid;
+	struct Page *p;
 	if (dstva >= UTOP) {
 		panic("sys_ipc_recv dstva is out of range!");
 		return ;
 	}
-	curenv->env_ipc_recving = 1;
+	int i = 0, j = 0;
+    for (; recv_index[i] != curenv->env_id && recv_index[i] != 0; i++);
+    //printf("ipc_recv recver: %d\n", recv_index[i]);
+	//recv_index[i] = e->env_id;
+    for (; msg[i][j].over; j++);
+	if (j == 0) {
+		printf("%x nothing to recv\n", curenv->env_id);
+		sys_yield();
+	}
+	//printf("ipc_recv sender: %d\n", msg[i][j].sender);
+	envid = msg[i][j].sender;
+	if ((r = envid2env(envid, &e, 0)) < 0) return r;
+	e->env_status = ENV_RUNNABLE;
+	//curenv->env_ipc_recving = 1;
 	curenv->env_ipc_dstva = dstva;
-	curenv->env_status = ENV_NOT_RUNNABLE;
-	sys_yield();
+	//curenv->env_status = ENV_NOT_RUNNABLE;
+//	sys_ipc_can_send(0, msg[i][j].recver, msg[i][j].value, msg[i][j].srcva, msg[i][j].perm);
+//	sys_yield();
+	msg[i][j].over = 1;
+	curenv->env_ipc_recving = 0;
+    curenv->env_ipc_perm = msg[i][j].perm;
+    curenv->env_ipc_from = envid;
+    curenv->env_ipc_value = msg[i][j].value;
+    curenv->env_status = ENV_RUNNABLE;
+    if (msg[i][j].srcva) {
+        Pte *tmp;
+        if ((p = page_lookup(e->env_pgdir, msg[i][j].srcva, &tmp)) == NULL) return -E_IPC_NOT_RECV;
+        if ((r = page_insert(curenv->env_pgdir, p, curenv->env_ipc_dstva, msg[i][j].perm)) < 0) return r;
+    }
 }
 
 /* Overview:
@@ -362,7 +401,23 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
         return -E_IPC_NOT_RECV;
     }
 	if ((r = envid2env(envid, &e, 0)) < 0) return r;
-	if (!e->env_ipc_recving) return -E_IPC_NOT_RECV;
+	if (!e->env_ipc_recving) {
+		
+		int i = 0, j = 0;
+		for (; recv_index[i] != e->env_id && recv_index[i] != 0; i++);
+		recv_index[i] = e->env_id;
+		//printf("%x")
+		for (; !(msg[i][j].over || msg[i][j].recver == 0); j++);
+		msg[i][j].sender = curenv->env_id;
+//		printf("ipc_send sender: %d\n", msg[i][j].sender);
+		msg[i][j].recver = e->env_id;
+		msg[i][j].value = value;
+		msg[i][j].srcva = srcva;
+		msg[i][j].perm = perm;
+		msg[i][j].over = 0;
+		curenv->env_status = ENV_NOT_RUNNABLE;
+		sys_yield();
+	}
 	e->env_ipc_recving = 0;
 	e->env_ipc_perm = perm;
 	e->env_ipc_from = curenv->env_id;
