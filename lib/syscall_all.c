@@ -419,7 +419,7 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 			break;
 		}
 	}
-	if (!check) return -E_INVAL;
+	if (!checked) return -E_INVAL;
 	
 	// write
 	bcopy((void *)va, (void *)target_addr, len);
@@ -462,7 +462,7 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
             break;
         }
     }
-    if (!check) return -E_INVAL;
+    if (!checked) return -E_INVAL;
 
 	// read
 	bcopy((void *)target_addr, (void *)va, len);
