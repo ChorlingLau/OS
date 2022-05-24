@@ -403,7 +403,28 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
  /*** exercise 5.1 ***/
 int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 {
-        // Your code here
+    // Your code here
+	int dev_cnt = 3;
+	u_int dev_start_addr[] = {0x10000000, 0x13000000, 0x15000000};
+	u_int dev_length[] = {0x20, 0x4200, 0x200};
+	u_int target_addr = dev + 0xa0000000;
+	int i = 0;
+	int checked = 0;
+	
+	// check
+	if (va >= ULIM) return -E_INVAL;
+	for (i = 0; i < dev_cnt; i++) {
+		if (dev_start_addr[i] <= dev && dev + len - 1 < dev_start_addr[i] + dev_length[i]) {
+			checked = 1;
+			break;
+		}
+	}
+	if (!check) return -E_INVAL;
+	
+	// write
+	bcopy((void *)va, (void *)target_addr, len);
+
+	return 0;
 }
 
 /* Overview:
@@ -425,5 +446,26 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
  /*** exercise 5.1 ***/
 int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 {
-        // Your code here
+    // Your code here
+	int dev_cnt = 3;
+	u_int dev_start_addr[] = {0x10000000, 0x13000000, 0x15000000};
+    u_int dev_length[] = {0x20, 0x4200, 0x200};
+    u_int target_addr = dev + 0xa0000000;
+    int i = 0;
+    int checked = 0;
+
+    // check
+    if (va >= ULIM) return -E_INVAL;
+    for (i = 0; i < dev_cnt; i++) {
+        if (dev_start_addr[i] <= dev && dev + len - 1 < dev_start_addr[i] + dev_length[i]) {
+            checked = 1;
+            break;
+        }
+    }
+    if (!check) return -E_INVAL;
+
+	// read
+	bcopy((void *)target_addr, (void *)va, len);
+
+	return 0;
 }
