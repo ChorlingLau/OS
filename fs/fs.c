@@ -198,7 +198,7 @@ void
 free_block(u_int blockno)
 {
 	// Step 1: Check if the parameter `blockno` is valid (`blockno` can't be zero).
-	if (!blockno || (super && blockno >= super->s_blocks)) {
+	if (!blockno || (super && blockno >= super->s_nblocks)) {
 		// panic("free_block invalid blockno!\n");
 		return ;
 	}
