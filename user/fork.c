@@ -6,7 +6,40 @@
 
 
 /* ----------------- help functions ---------------- */
-
+int make_shared(void *va) {
+	u_int perm = (*vpt)[VPN(va)] & 0xfff;
+//	writef("perm = %x\n", perm);
+	int r;
+	va = ROUNDDOWN(va, BY2PG);
+	if (!(perm & PTE_V)) {
+//		writef("new page, va = %x\n", va);
+		if ((r = syscall_mem_alloc(0, va, PTE_V | PTE_R)) < 0) {
+			return -1;
+		}
+//		writef("new page succeed\n");
+		/*if ((r = syscall_mem_map(0, USTACKTOP, 0, va, PTE_V | PTE_R)) < 0)
+			user_panic("Error mem map in make_shared.\n");
+		if ((r = syscall_mem_unmap(0, USTACKTOP)) < 0)
+			user_panic("Error mem unmap in make_shared.\n");*/
+	}
+	//writef("perm = %x\n", perm);
+//	writef("??: %x\n", ((Pte *)(*vpt))[VPN(va)] & 0xfff);
+	perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff | PTE_LIBRARY;
+	if (va >= UTOP || !(perm & PTE_R)) return -1;
+//	writef("??: %x\n", ((Pte *)(*vpt))[VPN(va)] & 0xfff);
+//	perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff | PTE_LIBRARY;
+//	writef("!!: %x\n", perm);
+	extern struct Env *envs;
+    extern struct Env *env;
+	env = &envs[ENVX(syscall_getenvid())];
+	if (syscall_mem_map(0, va, env->env_id, va, perm) < 0) {
+		user_panic("Error_mem_map");
+	}
+	/*struct Page *ppage;
+	Pte *ppte;
+	ppage = page_lookup(env->env_pgdir, va, &ppte);*/
+	return (((Pte *)(*vpt))[VPN(va)] & ~0xfff);
+}
 /* Overview:
  * 	Copy `len` bytes from `src` to `dst`.
  *

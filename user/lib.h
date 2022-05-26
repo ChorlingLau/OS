@@ -34,6 +34,7 @@ __attribute__((noreturn));
 
 
 /////////////////////////////////////////////////////fork spawn
+int make_shared(void *va);
 int spawn(char *prog, char **argv);
 int spawnl(char *prot, char *args, ...);
 int fork(void);
