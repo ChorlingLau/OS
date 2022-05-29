@@ -54,10 +54,12 @@ open(const char *path, int mode)
 	size = ffd->f_file.f_size;
 
 	// Step 4: Alloc memory, map the file content into memory.
-
+	for (i = 0; i < size; i += BY2BLK) {
+		if ((r = fsipc_map(fileid, i, va + i)) < 0) return r;
+	}
 
 	// Step 5: Return the number of file descriptor.
-
+	return fd2num(fd);
 
 }
 
@@ -261,7 +263,7 @@ remove(const char *path)
 {
 	// Your code here.
 	// Call fsipc_remove.
-
+	return fsipc_remove(path);
 }
 
 // Overview:
