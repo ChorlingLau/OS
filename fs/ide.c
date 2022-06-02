@@ -108,6 +108,7 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 }
 
 int raid4_valid(u_int diskno) {
+	//writef("raid4_valid start...\n");	
 	int tmp_off = 0;
 	u_char status = 0;
 	u_char read_value = 0;
@@ -126,34 +127,45 @@ int raid4_valid(u_int diskno) {
 }
 
  int raid4_write(u_int blockno, void *src) {
+	// writef("raid4_write start...\n");
 	int bad[5] = {0};
-	char content[8][512] = {0};
+	u_char content[8][512] = {0};
 	int diskno, secno;
 	int offset_begin = blockno * 2 * 0x200;
-	int offset_end = offset_begin + BY2PG;
+	int offset_end = offset_begin + 8 * 0x200;
 	int offset = 0;
 	for (diskno = 1; diskno <= 5; diskno++) {
-		bad[diskno-1] = raid4_valid(diskno);
+		bad[diskno-1] = 1 - raid4_valid(diskno);
 	}
-	while (offset < offset_end) {
+	while (offset_begin + offset < offset_end) {
+//		writef("write...\n");
 		diskno = (offset / 0x200) % 4 + 1;
+//		writef("diskno::::%d\n", diskno);
 		secno = blockno * 2 + offset / 0x200 / 4;
-		if (bad[diskno - 1]) continue;
+//		writef("secno::::%d\n", secno);
+		if (bad[diskno - 1]) {
+			offset += 0x200;
+			continue;
+		}
 		ide_write(diskno, secno, src + offset, 1);
-		user_bzero(content[offset / 0x200], 0x200);
-		user_bcopy(src + offset, content[offset / 0x200], 0x200);
+//		writef("%d\n", *(int *)(src + offset));
+//		user_bzero(content[offset / 0x200], 0x200);
+		user_bcopy((void *)src + offset, (void *)content[offset / 0x200], 0x200);
+//		writef("%d\n", *(int *)(content[offset / 0x200]));
 		offset += 0x200;
 	}
 	
-	char p[2][512] = {0};
+	u_char p[2][512] = {0};
 	int cnt = 0, i = 0;
 	for (i = 0; i < 512; i++) {
+//		writef("%d %d %d %d\n", content[0][i], content[1][i], content[2][i], content[3][i]);
 		p[0][i] = content[0][i] ^ content[1][i] ^ content[2][i] ^ content[3][i];
 		p[1][i] = content[4][i] ^ content[5][i] ^ content[6][i] ^ content[7][i];
 	}
+//	writef("%d, %d\n", p[0][3], p[1][3]);
 	if (!bad[4]) { 
-		ide_write(5, blockno*2, p[0], 1);
-	    ide_write(5, blockno*2+1, p[1], 1);
+		ide_write(5, blockno*2 + 0, p[0], 1);
+	    ide_write(5, blockno*2 + 1, p[1], 1);
 	}
 	
 	for (i = 0; i < 5; i++) {
@@ -164,13 +176,13 @@ int raid4_valid(u_int diskno) {
 
 int raid4_read(u_int blockno, void *dst) {
 	int bad[5] = {0}, badno = -1;
-    char content[8][512] = {0}, p[2][512] = {0};;
+    u_char content[8][512] = {0}, p[2][512] = {0};;
     int diskno, secno;
     int offset_begin = blockno * 2 * 0x200;
     int offset_end = offset_begin + BY2PG;
     int offset = 0;
     for (diskno = 1; diskno <= 5; diskno++) {
-        bad[diskno-1] = raid4_valid(diskno);
+        bad[diskno-1] = 1 - raid4_valid(diskno);
 		if (bad[diskno-1]) badno = diskno;
     }
 	int i, cnt = 0;
@@ -178,24 +190,26 @@ int raid4_read(u_int blockno, void *dst) {
         cnt += bad[i];
     }
     if (cnt > 1) return cnt;
-	while (offset < offset_end) {
+	while (offset_begin + offset < offset_end) {
         diskno = (offset / 0x200) % 4 + 1;
         secno = blockno * 2 + offset / 0x200 / 4;
         if (bad[diskno - 1]) {
-			user_bzero(content[offset / 0x200], 0x200);
+	//		user_bzero(content[offset / 0x200], 0x200);
+			offset += 0x200;
 			continue;
 		}
         ide_read(diskno, secno, dst + offset, 1);
-        user_bzero(content[offset / 0x200], 0x200);
-        user_bcopy(content[offset / 0x200], dst + offset, 0x200);
+  //      user_bzero((void *)content[offset / 0x200], 0x200);
+        user_bcopy(dst+offset, (void *)content[offset / 0x200], 0x200);
 		offset += 0x200;
     }
 	if (cnt == 0) {
 		ide_read(5, blockno*2, p[0], 1);
         ide_read(5, blockno*2+1, p[1], 1);
 		for (i = 0; i < 512; i++) {
+	//		writef("%d %d\n", p[0][i], p[1][i]);
 			if (p[0][i] != content[0][i] ^ content[1][i] ^ content[2][i] ^ content[3][i] ||
-				p[1][i] == content[4][i] ^ content[5][i] ^ content[6][i] ^ content[7][i]) {
+				p[1][i] != content[4][i] ^ content[5][i] ^ content[6][i] ^ content[7][i]) {
 				return -1;
 			}
 		}
