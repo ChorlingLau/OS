@@ -469,3 +469,14 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 
 	return 0;
 }
+
+int sys_time_read(int sysno)
+{
+	int time;
+	int trigger = 1;
+	if (sys_write_dev(0, (u_int)&trigger, 0x15000000, 1) < 0)
+		panic("get_time err 0x0\n");
+	if (sys_read_dev(0, (u_int)&time, 0x15000010, 4) < 0)
+		panic("get_time err 0x10\n");
+	return time;
+}

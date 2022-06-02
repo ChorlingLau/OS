@@ -106,3 +106,37 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 		offset += 0x200;
 	}
 }
+
+int time_read() {
+	int time;
+	int trigger = 1;
+	if (syscall_write_dev((u_int)&trigger, 0x15000000, 1) < 0)
+		user_panic("get_time err 0x0\n");
+	if (syscall_read_dev((u_int)&time, 0x15000010, 4) < 0)
+		user_panic("get_time err 0x10\n");
+	return time;
+}
+
+void raid0_write(u_int secno, void *src, u_int nsecs) {
+	int offset_begin = secno * 0x200;
+	int offset_end = offset_begin + nsecs * 0x200;
+	int offset = 0;
+	int now_secno = secno;
+	while (offset_begin + offset < offset_end) {
+		ide_write(1 + now_secno % 2, now_secno / 2, src + offset, 1);
+		offset += 0x200;
+		now_secno += 1;
+	}
+}
+
+void raid0_read(u_int secno, void *dst, u_int nsecs) {
+    int offset_begin = secno * 0x200;
+    int offset_end = offset_begin + nsecs * 0x200;
+    int offset = 0;
+	int now_secno = secno;
+    while (offset_begin + offset < offset_end) {
+        ide_read(1 + now_secno % 2, now_secno / 2, dst + offset, 1);
+        offset += 0x200;
+		now_secno += 1;
+    }
+}
