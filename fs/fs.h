@@ -15,6 +15,10 @@
 /* Maximum disk size we can handle (1GB) */
 #define DISKMAX		0x40000000
 
+int raid4_valid(u_int diskno);
+int raid4_write(u_int blockno, void *src);
+int raid4_read(u_int blockno, void *dst);
+
 /* ide.c */
 void ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs);
 void ide_write(u_int diskno, u_int secno, void *src, u_int nsecs);
