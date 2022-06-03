@@ -128,7 +128,7 @@ int spawn(char *prog, char **argv)
 	if ((r = readn(fd, elfbuf, sizeof(Elf32_Ehdr))) < 0) 
 		user_panic("read Ehdr failed!\n");
 	elf = (Elf32_Ehdr *)elfbuf;
-	if (!usr_is_elf_format((u_char *)elf) || elf->e_type != ET_EXEC)
+	if (!usr_is_elf_format((u_char *)elf) || elf->e_type != 2)
 		user_panic("Not ELF or EXEC!\n");
 	size = elf->e_phentsize;
 	text_start = elf->e_phoff;
