@@ -127,12 +127,12 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
 	char *rbuf;
 
 	p = (struct Pipe *)fd2data(fd);	
-	while (p->p_rpos == p->p_wpos) {
+	/*while (p->p_rpos == p->p_wpos) {
 		if (_pipeisclosed(fd, p)) return 0;
-	}
+	}*/
 	rbuf = (char *)vbuf;
 	for (i = 0; i < n; i++) {
-		while (p->p_rpos == p->p_wpos) {
+		while (p->p_rpos >= p->p_wpos) {
 			if (i > 0 || _pipeisclosed(fd, p)) return i;
 			syscall_yield();
 		}
@@ -190,9 +190,8 @@ pipestat(struct Fd *fd, struct Stat *stat)
 static int
 pipeclose(struct Fd *fd)
 {
-	struct Fd *tmp = fd;
 	syscall_mem_unmap(0, fd);
-	syscall_mem_unmap(0, fd2data(tmp));
+	syscall_mem_unmap(0, fd2data(fd));
 	return 0;
 }
 
