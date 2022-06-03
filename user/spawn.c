@@ -111,7 +111,7 @@ int spawn(char *prog, char **argv)
 	int r;
 	int fd;
 	u_int child_envid;
-	int size, text_start;
+	int size, text_start, count;
 	u_int i, *blk;
 	u_int esp;
 	Elf32_Ehdr* elf;
@@ -124,8 +124,23 @@ int spawn(char *prog, char **argv)
 	}
 	// Your code begins here
 	// Before Step 2 , You had better check the "target" spawned is a execute bin 
+	fd = r;
+	if ((r = readn(fd, elfbuf, sizeof(Elf32_Ehdr))) < 0) 
+		user_panic("read Ehdr failed!\n");
+	elf = (Elf32_Ehdr *)elfbuf;
+	if (!usr_is_elf_format((u_char *)elf) || elf->e_type != ET_EXEC)
+		user_panic("Not ELF or EXEC!\n");
+	size = elf->e_phentsize;
+	text_start = elf->e_phoff;
+	count = elf->e_phnum;
+
 	// Step 2: Allocate an env (Hint: using syscall_env_alloc())
+	if ((child_envid = syscall_env_alloc()) < 0) 
+		user_panic("alloc env failed!\n");
+
 	// Step 3: Using init_stack(...) to initialize the stack of the allocated env
+	init_stack(child_envid, argv, &esp);
+
 	// Step 3: Map file's content to new env's text segment
 	//        Hint 1: what is the offset of the text segment in file? try to use objdump to find out.
 	//        Hint 2: using read_map(...)
@@ -135,6 +150,17 @@ int spawn(char *prog, char **argv)
 	//       the file is opened successfully, and env is allocated successfully.
 	// Note2: You can achieve this func in any way ，remember to ensure the correctness
 	//        Maybe you can review lab3 
+	for (i = 0; i < count; i++) {
+		if ((r = seek(fd, text_start)) < 0) user_panic("seek failed!\n");
+		if ((r = readn(fd, elfbuf, size)) < 0) user_panic("readn failed!\n");
+		ph = (Elf32_Phdr *)elfbuf;
+		if (ph->p_type == PT_LOAD) {
+			if ((r = usr_load_elf(fd, ph, child_envid)) < 0)
+				user_panic("load elf failed!\n");
+		}
+		text_start += size;
+	}
+
 	// Your code ends here
 
 	struct Trapframe *tf;
