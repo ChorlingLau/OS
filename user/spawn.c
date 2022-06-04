@@ -159,7 +159,7 @@ usr_load_elf(int fd , Elf32_Phdr *ph, int child_envid){
 
 int spawn(char *prog, char **argv)
 {
-	u_char *elfbuf;
+	u_char elfbuf[512];
 	int r;
 	int fd;
 	u_int child_envid;
@@ -178,7 +178,8 @@ int spawn(char *prog, char **argv)
 	// Before Step 2 , You had better check the "target" spawned is a execute bin 
 //	writef("before step2\n");
 	fd = r;
-	elfbuf = (u_char *)fd2data(num2fd(fd));
+	if ((r = rean(fd, elfbuf, sizeof(Elf32_Ehdr))) < 0) return r;
+//	elfbuf = (u_char *)fd2data(num2fd(fd));
 	elf = (Elf32_Ehdr *)elfbuf;
 	if (!usr_is_elf_format((u_char *)elf) || elf->e_type != 2)
 		user_panic("Not ELF or EXEC!\n");	
