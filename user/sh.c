@@ -143,8 +143,8 @@ again:
 				goto again;
 			} else {
 				dup(p[1], 1);
-				close(p[0]);
 				close(p[1]);
+				close(p[0]);
 				goto runit;
 			}
 //			user_panic("| not implemented");

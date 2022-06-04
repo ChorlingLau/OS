@@ -205,7 +205,7 @@ int spawn(char *prog, char **argv)
 	// Note2: You can achieve this func in any way ，remember to ensure the correctness
 	//        Maybe you can review lab3 
 //	writef("step3-2\n");
-	/*for (i = 0; i < count; i++) {
+	for (i = 0; i < count; i++) {
 		if ((r = seek(fd, text_start)) < 0) user_panic("seek failed!\n");
 		if ((r = readn(fd, elfbuf, size)) < 0) user_panic("readn failed!\n");
 		ph = (Elf32_Phdr *)elfbuf;
@@ -214,7 +214,7 @@ int spawn(char *prog, char **argv)
 				user_panic("load elf failed!\n");
 		}
 		text_start += size;
-	}*/
+	}
 	/*while (count--) {
 		ph = (Elf32_Phdr *)text_start;
 		if (ph->p_type == PT_LOAD) {
@@ -225,7 +225,7 @@ int spawn(char *prog, char **argv)
 	}
 	syscall_set_pgfault_handler(child_envid, __asm_pgfault_handler, UXSTACKTOP);
 	*/
-	size = ((struct Filefd*)num2fd(fd))->f_file.f_size;
+	/*size = ((struct Filefd*)num2fd(fd))->f_file.f_size;
 	for(i = 0x1000; i < size; i += BY2PG) {
 		if((r = read_map(fd, i, &blk)) < 0)	{
 			writef("mapping text region is wrong\n");
@@ -234,7 +234,7 @@ int spawn(char *prog, char **argv)
 
 		syscall_mem_map(0, blk, child_envid, UTEXT + text_start, PTE_V |PTE_R);
 		text_start += BY2PG;
-	}
+	}*/
 	// Your code ends here
 //	writef("code end.\n");
 
