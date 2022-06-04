@@ -1,7 +1,7 @@
 #include "lib.h"
 #include <args.h>
 
-int debug_ = 1;
+int debug_ = 0;
 
 //
 // get the next token from string s
@@ -112,6 +112,10 @@ again:
 //			user_panic("< redirection not implemented");
 			break;
 		case '>':
+			if(gettoken(0, &t) != 'w'){
+                writef("syntax error: > not followed by word\n");
+                exit();
+            }
 			// Your code here -- open t for writing,
 			// dup it onto fd 1, and then close the fd you got.
 			if ((fd = open(t, O_WRONLY)) < 0) user_panic("> open failed!\n");
