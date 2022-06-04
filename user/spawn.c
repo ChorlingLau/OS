@@ -178,7 +178,7 @@ int spawn(char *prog, char **argv)
 	// Before Step 2 , You had better check the "target" spawned is a execute bin 
 //	writef("before step2\n");
 	fd = r;
-	if ((r = rean(fd, elfbuf, sizeof(Elf32_Ehdr))) < 0) return r;
+	if ((r = readn(fd, elfbuf, sizeof(Elf32_Ehdr))) < 0) return r;
 //	elfbuf = (u_char *)fd2data(num2fd(fd));
 	elf = (Elf32_Ehdr *)elfbuf;
 	if (!usr_is_elf_format((u_char *)elf) || elf->e_type != 2)
