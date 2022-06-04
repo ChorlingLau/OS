@@ -1,7 +1,7 @@
 #include "lib.h"
 #include <args.h>
 
-int debug_ = 0;
+int debug_ = 1;
 
 //
 // get the next token from string s
@@ -139,7 +139,8 @@ again:
 			if (!(rightpipe = fork())) {
 				dup(p[0], 0);
 				close(p[0]);
-				close(p[1]);goto again;
+				close(p[1]);
+				goto again;
 			} else {
 				dup(p[1], 1);
 				close(p[0]);
@@ -223,11 +224,11 @@ umain(int argc, char **argv)
 	int r, interactive, echocmds;
 	interactive = '?';
 	echocmds = 0;
-	writef("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+/*	writef("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	writef("::                                                         ::\n");
 	writef("::              Super Shell  V0.0.0_1                      ::\n");
 	writef("::                                                         ::\n");
-	writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");*/
 	ARGBEGIN{
 	case 'd':
 		debug_++;
