@@ -15,6 +15,7 @@ extern void exit();
 extern struct Env *env;
 
 #define O_APPEND 0x0004
+#define O_ALONE 0x0008
 #define USED(x) (void)(x)
 //////////////////////////////////////////////////////printf
 #include <stdarg.h>
