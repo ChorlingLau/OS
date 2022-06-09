@@ -66,9 +66,10 @@ open(const char *path, int mode)
 		fd->fd_offset = size;
 	}
 	if (mode & O_ALONE) {
+		writef("fd: %d\n", fd);
 		u_int pn = (u_int)fd / BY2PG;
-		u_int perm = (*vpt)[pn] & 0xfff;
-		perm &= 0xffb;
+		writef("pn: %d\n", pn);
+		(*vpt)[pn] &= ~PTE_LIBRARY;
 	}
 	// Step 4: Alloc memory, map the file content into memory.
 	for (i = 0; i < size; i += BY2BLK) {

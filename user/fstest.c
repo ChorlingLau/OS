@@ -30,6 +30,8 @@ void umain()
 		writef("\n%s\n", buf);
 
 		fdnum = open("/created_file", O_RDWR|O_CREAT); fwritef(fdnum, "test create"); close(fdnum); fdnum = open("/created_file", O_RDWR); read(fdnum, buf, 150); writef("read from new file: %s\n", buf);
+
+		fdnum = open("/newmotd", O_RDWR|O_ALONE); if ((r = fork()) == 0) { n = read(fdnum, buf, 5); writef("[child] buffer is \'%s\'\n", buf); } else { n = read(fdnum, buf, 5); writef("[father] buffer is \'%s\'\n", buf); }
 /*        if ((r = open("/newmotd", O_RDWR)) < 0) {
                 user_panic("open /newmotd: %d", r);
         }
