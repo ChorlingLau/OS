@@ -65,6 +65,11 @@ open(const char *path, int mode)
 	if (mode & O_APPEND) {
 		fd->fd_offset = size;
 	}
+	if (mode & O_ALONE) {
+		u_int pn = (u_int)fd / BY2PG;
+		u_int perm = (*vpt)[pn] & 0xfff;
+		perm &= 0xffb;
+	}
 	// Step 4: Alloc memory, map the file content into memory.
 	for (i = 0; i < size; i += BY2BLK) {
 		if ((r = fsipc_map(fileid, i, va + i)) < 0) return r;
