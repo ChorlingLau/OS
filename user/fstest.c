@@ -10,7 +10,9 @@ void umain()
         char buf[512];
         int n;
 
-        if ((r = open("/newmotd", O_RDWR)) < 0) {
+		if ((r = open("/motd", O_RDWR) < 0)) { user_panic("open /motd: %d\n", r); }fdnum = r; if (r = fwritef(fdnum, "test append") < 0) { user_panic("fwritef %d\n", r); }close(fdnum); if ((r = open("/motd", O_RDWR) < 0)) { user_panic("open /motd: %d\n", r); }if ((n = read(fdnum, buf, 150)) < 0) { writef("read %d\n", n);}
+
+/*        if ((r = open("/newmotd", O_RDWR)) < 0) {
                 user_panic("open /newmotd: %d", r);
         }
         fdnum = r;
@@ -65,7 +67,7 @@ void umain()
 	writef("file remove: OK\n");
         while (1) {
                 //writef("IDLE!");
-        }
+        }*/
 }
 
 
