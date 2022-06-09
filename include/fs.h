@@ -71,6 +71,7 @@ struct Fsreq_open {
 struct Fsreq_map {
 	int req_fileid;
 	u_int req_offset;
+	int notshare;
 };
 
 struct Fsreq_set_size {

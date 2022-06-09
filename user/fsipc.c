@@ -62,7 +62,7 @@ fsipc_open(const char *path, u_int omode, struct Fd *fd)
 //	0 on success,
 //	< 0 on failure.
 int
-fsipc_map(u_int fileid, u_int offset, u_int dstva)
+fsipc_map(u_int fileid, u_int offset, u_int dstva, int notshare)
 {
 	int r;
 	u_int perm;
@@ -71,16 +71,17 @@ fsipc_map(u_int fileid, u_int offset, u_int dstva)
 	req = (struct Fsreq_map *)fsipcbuf;
 	req->req_fileid = fileid;
 	req->req_offset = offset;
+	req->notshare = notshare;
 
 	if ((r = fsipc(FSREQ_MAP, req, dstva, &perm)) < 0) {
 		return r;
 	}
 
-	if ((perm & ~(PTE_R | PTE_LIBRARY)) != (PTE_V)) {
+/*	if ((perm & ~(PTE_R | PTE_LIBRARY)) != (PTE_V)) {
 		user_panic("fsipc_map: unexpected permissions %08x for dstva %08x", perm,
 				   dstva);
 	}
-
+*/
 	return 0;
 }
 
