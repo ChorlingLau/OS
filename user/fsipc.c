@@ -162,5 +162,6 @@ int fsipc_create(const char *path)
         }
 
         strcpy((char *)req->req_path, path);
-        return fsipc(FSREQ_CREATE, req, 0, 0);
+        req->isdir = 0;
+		return fsipc(FSREQ_CREATE, req, 0, 0);
 }
