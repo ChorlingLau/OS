@@ -19,7 +19,7 @@ void umain()
 			user_panic("fwritef %d\n", r); 
 		}
 		close(fdnum); 
-		if ((r = open("/motd", O_RDWR) < 0)) { 
+		if ((r = open("/motd", O_RDWR|O_CREAT) < 0)) { 
 			user_panic("open /motd: %d\n", r); 
 		}
 		if ((n = read(fdnum, buf, 150)) < 0) { 
