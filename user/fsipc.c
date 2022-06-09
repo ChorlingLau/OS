@@ -62,7 +62,7 @@ fsipc_open(const char *path, u_int omode, struct Fd *fd)
 //	0 on success,
 //	< 0 on failure.
 int
-fsipc_map(u_int fileid, u_int offset, u_int dstva, int notshare)
+fsipc_map(u_int fileid, u_int offset, u_int dstva)
 {
 	int r;
 	u_int perm;
@@ -71,7 +71,6 @@ fsipc_map(u_int fileid, u_int offset, u_int dstva, int notshare)
 	req = (struct Fsreq_map *)fsipcbuf;
 	req->req_fileid = fileid;
 	req->req_offset = offset;
-	req->notshare = notshare;
 
 	if ((r = fsipc(FSREQ_MAP, req, dstva, &perm)) < 0) {
 		return r;

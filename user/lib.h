@@ -102,7 +102,7 @@ int fwritef(int fd, const char *fmt, ...);
 
 // fsipc.c
 int	fsipc_open(const char *, u_int, struct Fd *);
-int	fsipc_map(u_int, u_int, u_int, int);
+int	fsipc_map(u_int, u_int, u_int);
 int	fsipc_set_size(u_int, u_int);
 int	fsipc_close(u_int);
 int	fsipc_dirty(u_int, u_int);
