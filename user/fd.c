@@ -209,7 +209,8 @@ read(int fdnum, void *buf, u_int n)
 	r = (*dev->dev_read)(fd, buf, n, fd->fd_offset);
 	
 	// Step 4: Update seek position and set '\0' at the end of buf.
-	if (r > 0) fd->fd_offset += r;
+	if (r < 0) return r;
+	else if (r > 0) fd->fd_offset += r;
 	((char *)buf)[r] = '\0';
 	return r;
 }
