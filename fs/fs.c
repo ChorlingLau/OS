@@ -16,7 +16,7 @@ int block_is_free(u_int);
 u_int
 diskaddr(u_int blockno)
 {
-	if (super && blockno > super->s_nblocks) user_panic("diskaddr blockno is out of range!\n");
+	if (super && blockno >= super->s_nblocks) user_panic("diskaddr blockno is out of range!\n");
 	return DISKMAP + blockno * BY2BLK;
 }
 
@@ -73,7 +73,7 @@ map_block(u_int blockno)
 	addr = block_is_mapped(blockno);
 	if (addr) return 0;
 	// Step 2: Alloc a page of memory for this block via syscall.
-	return syscall_mem_alloc(0, addr, PTE_V | PTE_R);
+	return syscall_mem_alloc(0, diskaddr(blockno), PTE_V | PTE_R);
 }
 
 // Overview:
@@ -203,13 +203,13 @@ void
 free_block(u_int blockno)
 {
 	// Step 1: Check if the parameter `blockno` is valid (`blockno` can't be zero).
-	if (!blockno || (super && blockno >= super->s_nblocks)) {
+	if (!super || !blockno || (super && blockno >= super->s_nblocks)) {
 		// panic("free_block invalid blockno!\n");
 		return ;
 	}
 	// Step 2: Update the flag bit in bitmap.
 	// you can use bit operation to update flags, such as  a |= (1 << n) .
-	bitmap[blockno / 32] |= (1 << (blockno % 32));
+	bitmap[blockno >> 5] |= (1 << (blockno & 31));
 }
 
 // Overview:
