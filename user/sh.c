@@ -12,6 +12,7 @@ int debug_ = 0;
 //	> for >
 //	| for |
 //	w for a word
+//  a for >>
 //
 // eventually (once we parse the space where the nul will go),
 // words get nul-terminated.
@@ -21,7 +22,7 @@ int debug_ = 0;
 int
 _gettoken(char *s, char **p1, char **p2)
 {
-	int t;
+	int t;	// tmp token
 
 	if (s == 0) {
 		//if (debug_ > 1) writef("GETTOKEN NULL\n");
@@ -33,11 +34,28 @@ _gettoken(char *s, char **p1, char **p2)
 	*p1 = 0;
 	*p2 = 0;
 
+	// remove all left-side whitespace
 	while(strchr(WHITESPACE, *s))
 		*s++ = 0;
 	if(*s == 0) {
 	//	if (debug_ > 1) writef("EOL\n");
 		return 0;
+	}
+
+	// special quotes(")
+	if (*s == '\"') {
+		*p1 = ++s;
+		while (*s && !(*s == '\"' && *(s-1) != '\\')) s++;
+		*p2 = s;
+		return 'w';
+	}
+	
+	// get a symbol and return it for analysis
+	if (*s == '>' && *(s+1) == '>') {
+		*p1 = s;
+		*s++ = 0;
+		*s++ = 0;
+		*p2 = s;
 	}
 	if(strchr(SYMBOLS, *s)){
 		t = *s;
@@ -47,9 +65,12 @@ _gettoken(char *s, char **p1, char **p2)
 //		if (debug_ > 1) writef("TOK %c\n", t);
 		return t;
 	}
+	// get a string and go on
+	// p1 point to 1st string
 	*p1 = s;
 	while(*s && !strchr(WHITESPACE SYMBOLS, *s))
 		s++;
+	// p2 point to the rest string
 	*p2 = s;
 	if (debug_ > 1) {
 		t = **p2;
@@ -82,7 +103,8 @@ runcmd(char *s)
 {
 	char *argv[MAXARGS], *t;
 	int argc, c, i, r, p[2], fd, rightpipe;
-	int fdnum;
+	int fdnum, hang = 0, pid;
+	int input_fd = -1, output_fd = -1;
 	rightpipe = 0;
 	gettoken(s, 0);
 again:
@@ -90,91 +112,152 @@ again:
 	for(;;){
 		c = gettoken(0, &t);
 		switch(c){
-		case 0:
-			goto runit;
-		case 'w':
-			if(argc == MAXARGS){
-				writef("too many arguments\n");
-				exit();
-			}
-			argv[argc++] = t;
-			break;
-		case '<':
-			if(gettoken(0, &t) != 'w'){
-				writef("syntax error: < not followed by word\n");
-				exit();
-			}
-			// Your code here -- open t for reading,
-			// dup it onto fd 0, and then close the fd you got.
-			if ((fd = open(t, O_RDONLY)) < 0) user_panic("< open failed!\n");
-			dup(fd, 0);
-			close(fd);
-//			user_panic("< redirection not implemented");
-			break;
-		case '>':
-			if(gettoken(0, &t) != 'w'){
-                writef("syntax error: > not followed by word\n");
-                exit();
-            }
-			// Your code here -- open t for writing,
-			// dup it onto fd 1, and then close the fd you got.
-			if ((fd = open(t, O_WRONLY)) < 0) user_panic("> open failed!\n");
-            dup(fd, 1);
-            close(fd);
-//			user_panic("> redirection not implemented");
-			break;
-		case '|':
-			// Your code here.
-			// 	First, allocate a pipe.
-			//	Then fork.
-			//	the child runs the right side of the pipe:
-			//		dup the read end of the pipe onto 0
-			//		close the read end of the pipe
-			//		close the write end of the pipe
-			//		goto again, to parse the rest of the command line
-			//	the parent runs the left side of the pipe:
-			//		dup the write end of the pipe onto 1
-			//		close the write end of the pipe
-			//		close the read end of the pipe
-			//		set "rightpipe" to the child envid
-			//		goto runit, to execute this piece of the pipeline
-			//			and then wait for the right side to finish
-			pipe(p);
-			if (!(rightpipe = fork())) {
-				dup(p[0], 0);
-				close(p[0]);
-				close(p[1]);
-				goto again;
-			} else {
-				dup(p[1], 1);
-				close(p[1]);
-				close(p[0]);
+			case 0:
 				goto runit;
-			}
-//			user_panic("| not implemented");
-			break;
+			case 'w':
+				if(argc == MAXARGS){
+					writef("too many arguments\n");
+					exit();
+				}
+				argv[argc++] = t;
+				break;
+			case '<':
+				if(gettoken(0, &t) != 'w'){
+					writef("syntax error: < not followed by word\n");
+					exit();
+				}
+				// Your code here -- open t for reading,
+				// dup it onto fd 0, and then close the fd you got.
+				if ((fd = open(t, O_RDONLY)) < 0) user_panic("< open failed!\n");
+				// dup(fd, 0);
+				// close(fd);
+				input_fd = fd;
+				break;
+			case '>':
+				if(gettoken(0, &t) != 'w'){
+					writef("syntax error: > not followed by word\n");
+					exit();
+				}
+				// Your code here -- open t for writing,
+				// dup it onto fd 1, and then close the fd you got.
+				if ((fd = open(t, O_WRONLY)) < 0) user_panic("> open failed!\n");
+				// dup(fd, 1);
+				// close(fd);
+				output_fd = fd;
+				break;
+			case 'a':
+				if(gettoken(0, &t) != 'w'){
+					writef("syntax error: >> not followed by word\n");
+					exit();
+				}
+				if ((fd = open(t, O_WRONLY | O_CREAT | O_APPEND)) < 0) 
+					user_panic(">> open failed!\n");
+				output_fd = fd;
+				break;
+			case '|':
+				// Your code here.
+				// 	First, allocate a pipe.
+				//	Then fork.
+				//	the child runs the right side of the pipe:
+				//		dup the read end of the pipe onto 0
+				//		close the read end of the pipe
+				//		close the write end of the pipe
+				//		goto again, to parse the rest of the command line
+				//	the parent runs the left side of the pipe:
+				//		dup the write end of the pipe onto 1
+				//		close the write end of the pipe
+				//		close the read end of the pipe
+				//		set "rightpipe" to the child envid
+				//		goto runit, to execute this piece of the pipeline
+				//			and then wait for the right side to finish
+				pipe(p);
+				if (!(rightpipe = fork())) {
+					// dup(p[0], 0);
+					// close(p[0]);
+					input_fd = p[0];
+					close(p[1]);
+					goto again;
+				} else {
+					// dup(p[1], 1);
+					// close(p[1]);
+					output_fd = p[1];
+					close(p[0]);
+					goto runit;
+				}
+				break;
+			case '&':
+				hang = 1;
+				break;
+			case ';':
+				// fork a child env to run cmd at the left of ";",
+				// initialize parent env for the right
+				if ((pid = fork()) == 0) {
+                    input_fd = -1;
+                    output_fd = -1;
+                    goto runit;
+                }
+                argc = 0;
+                hang = 0;
+                rightpipe = 0;
+                break;
 		}
 	}
 
 runit:
+	// don't operate the pipe until runit 
+	if (input_fd != -1) {
+		dup(input_fd, 0);
+		close(input_fd);
+	}
+	if (output_fd != -1) {
+		dup(output_fd, 0);
+		close(output_fd);
+	}
+
 	if(argc == 0) {
 		if (debug_) writef("EMPTY COMMAND\n");
 		return;
 	}
 	argv[argc] = 0;
-	if (1) {
+	if (debug_) {
 		writef("[%08x] SPAWN:", env->env_id);
 		for (i=0; argv[i]; i++)
 			writef(" %s", argv[i]);
 		writef("\n");
 	}
-
-	if ((r = spawn(argv[0], argv)) < 0)
-		writef("spawn %s: %e\n", argv[0], r);
+	
+	char cmd_name = strcat(argv[0], ".b\0");
+	if ((r = spawn(cmd_name, argv)) < 0)
+		writef("spawn %s: %e\n", cmd_name, r);
+	if (hang) {
+		writef("[%d] WAIT (hang) ", r);
+		for (i = 0; i < argc; i++) {
+			writef("%s ", argv[i]);
+		}
+		writef("\n");
+	}
+	if (syscall_set_env_status(r, ENV_RUNNABLE) < 0)
+		writef("set child env states failed!\n");
 	close_all();
 	if (r >= 0) {
 		if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
-		wait(r);
+		if (!hang) wait(r);
+		else {
+			if ((pid = fork()) == 0) {
+				wait(r);
+				writef("[%d] DONE ", r);
+				for (i = 0; i < argc; i++) {
+					writef("%s ", argv[i]);
+				}
+				writef("\n");
+
+				char curpath[MAXPATHLEN];
+                curpath_get(curpath);
+                writef("%s $ ", curpath);
+                writef("\b \b");
+                exit();
+			}
+		}
 	}
 	if (rightpipe) {
 		if (debug_) writef("[%08x] WAIT right-pipe %08x\n", env->env_id, rightpipe);
@@ -182,6 +265,13 @@ runit:
 	}
 
 	exit();
+}
+
+// flush the whole buffer
+void
+flush(char *buf) {
+    int i;
+    for (i = 0; i < strlen(buf); i++) writef("\b \b");
 }
 
 void
@@ -208,8 +298,7 @@ readline(char *buf, u_int n)
 		}
 	}
 	writef("line too long\n");
-	while((r = read(0, buf, 1)) == 1 && buf[0] != '\n')
-		;
+	while((r = read(0, buf, 1)) == 1 && buf[0] != '\n');
 	buf[0] = 0;
 }	
 

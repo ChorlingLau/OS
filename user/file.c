@@ -44,7 +44,15 @@ open(const char *path, int mode)
 
 	// Step 2: Get the file descriptor of the file to open.
 	// Hint: Read fsipc.c, and choose a function.
-	if ((r = fsipc_open(path, mode, fd)) < 0) return r;
+	if ((r = fsipc_open(path, mode, fd)) < 0) {
+		if ((r == -E_NOT_FOUND) && (mode & O_CREAT)) {
+			if ((r = fsipc_create(path)) < 0) return r;
+			fsipc_open(path, mode, fd);
+	    } else {
+			return r;
+		}
+	}
+
 
 	// Step 3: Set the start address storing the file's content. Set size and fileid correctly.
 	// Hint: Use fd2data to get the start address.
@@ -52,6 +60,11 @@ open(const char *path, int mode)
 	va = fd2data(fd);
 	fileid = ffd->f_fileid;
 	size = ffd->f_file.f_size;
+	
+	fd->fd_offset = 0;
+	if (mode & O_APPEND) {
+		fd->fd_offset = size;
+	}
 
 	// Step 4: Alloc memory, map the file content into memory.
 	for (i = 0; i < size; i += BY2BLK) {

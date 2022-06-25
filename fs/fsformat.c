@@ -267,6 +267,14 @@ void write_file(struct File *dirf, const char *path) {
 //      We ASSUME that this funcion will never fail
 void write_directory(struct File *dirf, char *name) {
     // Your code here
+    struct File *new_dir = create_file(dirf);
+    const char *fname = strrchr(name, '/');
+    if (fname) fname++;
+    else fname = name;
+    strcpy(new_dir->f_name, fname);
+
+    new_dir->f_size = 0;
+    new_dir->f_type = FTYPE_DIR;
 }
 
 int main(int argc, char **argv) {
