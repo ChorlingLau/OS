@@ -226,7 +226,10 @@ runit:
 		writef("\n");
 	}
 	
-	char cmd_name = strcat(argv[0], ".b\0");
+	char cmd_name[64] = {0};
+	strcpy(cmd_name, argv[0]);
+	strcat(cmd_name, ".b\0");
+	writef("cmd_name: %s\n", cmd_name);
 	if ((r = spawn(cmd_name, argv)) < 0)
 		writef("spawn %s: %e\n", cmd_name, r);
 	if (hang) {
@@ -251,8 +254,8 @@ runit:
 				}
 				writef("\n");
 
-				char curpath[MAXPATHLEN];
-                curpath_get(curpath);
+				char curpath[MAXPATHLEN] = {0};
+                // curpath_get(curpath);
                 writef("%s $ ", curpath);
                 writef("\b \b");
                 exit();
