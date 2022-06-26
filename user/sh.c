@@ -257,7 +257,7 @@ runit:
 				writef("\n");
 
 				char curpath[MAXPATHLEN] = {0};
-                // curpath_get(curpath);
+                curpath_get(curpath);
                 writef("%s $ ", curpath);
                 writef("\b \b");
                 exit();

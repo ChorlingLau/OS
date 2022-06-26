@@ -78,3 +78,13 @@ strcat(char *dst, const char *src)
     while (*dst++ = *src++);
     return ret;
 }
+
+u_int
+strhash(const char *str)
+{
+    u_int hash = 5381;
+    u_int i = 0;
+    while (*str) hash = ((hash << 5) + hash) + (*str++);
+    return hash % ((1 << 8) - 1);
+}
+

@@ -75,6 +75,7 @@ const char *strchr(const char *s, char c);
 void *memcpy(void *destaddr, void const *srcaddr, u_int len);
 int strcmp(const char *p, const char *q);
 char *strcat(char *dst, const char *src);
+u_int strhash(const char *str);
 
 // ipc.c
 void	ipc_send(u_int whom, u_int val, u_int srcva, u_int perm);
@@ -127,6 +128,12 @@ int	read_map(int fd, u_int offset, void **blk);
 int	remove(const char *path);
 int	ftruncate(int fd, u_int size);
 int	sync(void);
+
+// curpath.c
+void curpath_init(char *path);
+int curpath_get(char *path);
+int curpath_set(char *path);
+int curpath_get_parent(char *path);
 
 #define user_assert(x)	\
 	do {	if (!(x)) user_panic("assertion failed: %s", #x); } while (0)

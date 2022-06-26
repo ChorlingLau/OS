@@ -1,4 +1,5 @@
 #include "../drivers/gxconsole/dev_cons.h"
+#include "../user/lib.h"
 #include <mmu.h>
 #include <env.h>
 #include <printf.h>
@@ -469,3 +470,79 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 
 	return 0;
 }
+
+/* 0 -- create
+ * 1 -- get
+ * 2 -- set
+ * 3 -- unset
+ * 4 -- get list
+ * 5 -- create RDONLY
+ */
+int sys_env_var(int sysno, char *name, char *value, u_int op) {
+    const int MOD = 1 << 8;
+    static char name_table[1 << 8][64];
+    static char value_table[1 << 8][256];
+    static int isRDONLY[1 << 8];
+
+    if (op == 4) {
+        char **name_list = name;
+        char **value_list = value;
+        int pos = 0, i;
+        for (i = 0; i < MOD; ++i)
+            if (name_table[i][0]) {
+                name_list[pos] = name_table[i];
+                value_list[pos] = value_table[i];
+                ++pos;
+            }
+        name_list[pos] = 0;
+    }
+
+    u_int pos = strhash(name);
+	u_int init_pos = pos;
+    while (name_table[pos][0]) {
+        if (strcmp(name_table[pos], name) == 0) { // found
+            if (op == 0) return 0;	// already existed, END
+            break;
+        } else {	// not found, go on to search
+            ++pos;
+            if (pos == MOD) pos = 0;	// circle
+			if (pos == init_pos) return -E_ENV_VAR_NOT_FOUND;
+        }
+    }
+
+    if (op == 0) {
+		// create the var, store it into table
+        strcpy(name_table[pos], name);
+        strcpy(value_table[pos], value);
+    } 
+	else if (op == 1) {
+		// get value and return with "value"
+        strcpy(value, value_table[pos]);
+    } 
+	else if (op == 2) {
+		// set value if not read only
+        if (isRDONLY[pos]) return -E_ENV_VAR_RDONLY;
+        strcpy(value_table[pos], value);
+    } 
+	else if (op == 3) {
+		// delete the var if not read only
+        if (isRDONLY[pos]) return -E_ENV_VAR_RDONLY;
+		
+		int p = 0;
+		while (p < 64 && name_table[pos][p])
+			name_table[pos][p++] = 0;
+		
+		p = 0;
+		while (p < 256 && value_table[pos][p])
+			value_table[pos][p++] = 0;
+    } 
+	else if (op == 5) {
+		// create the var, store it into table and mark read only
+        strcpy(name_table[pos], name);
+        strcpy(value_table[pos], value);
+        isRDONLY[pos] = 1;
+    }
+
+    return 0;
+}
+
