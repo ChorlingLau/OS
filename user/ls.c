@@ -34,6 +34,7 @@ lsdir(char *path, char *prefix)
 		user_panic("short read in directory %s", path);
 	if (n < 0)
 		user_panic("error reading directory %s: %e", path, n);
+	close(fd);
 }
 
 void
@@ -84,6 +85,7 @@ umain(int argc, char **argv)
 		for (i=0; i<argc; i++)
 			ls(argv[i], argv[i]);
 	}
+	fwritef(1, "\n");
 }
 
 

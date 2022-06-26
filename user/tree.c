@@ -2,7 +2,7 @@
 
 int flag[256];
 
-void tree_start(char*, int);
+void tree_start(char*, u_int);
 void walk(char*, int, int);
 void printcs(char, int, int);
 
@@ -10,12 +10,12 @@ void tree(char *path, char *prefix) {
     int r;
 	struct Stat st;
 
-	if ((r=stat(path, &st)) < 0)
+	if ((r = stat(path, &st)) < 0)
 		user_panic("stat %s: %e", path, r);
 	tree_start(path, -1);
 }
 
-void tree_start(char *path, int recursive) {
+void tree_start(char *path, u_int recursive) {
     fwritef(1, ".%s", path);
     // DFS walk and print
     walk(path, 0, recursive);
@@ -63,6 +63,7 @@ void usage(void) {
 }
 
 void umain(int argc, char **argv) {
+	writef("tree.b start...\n");
     int i;
 
     ARGBEGIN{

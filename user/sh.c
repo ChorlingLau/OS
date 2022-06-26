@@ -1,7 +1,7 @@
 #include "lib.h"
 #include <args.h>
 
-int debug_ = 0;
+int debug_ = 1;
 
 //
 // get the next token from string s
@@ -46,6 +46,7 @@ _gettoken(char *s, char **p1, char **p2)
 	if (*s == '\"') {
 		*p1 = ++s;
 		while (*s && !(*s == '\"' && *(s-1) != '\\')) s++;
+		*s++ = 0;
 		*p2 = s;
 		return 'w';
 	}
@@ -56,6 +57,7 @@ _gettoken(char *s, char **p1, char **p2)
 		*s++ = 0;
 		*s++ = 0;
 		*p2 = s;
+		return 'a';
 	}
 	if(strchr(SYMBOLS, *s)){
 		t = *s;
@@ -140,7 +142,7 @@ again:
 				}
 				// Your code here -- open t for writing,
 				// dup it onto fd 1, and then close the fd you got.
-				if ((fd = open(t, O_WRONLY)) < 0) user_panic("> open failed!\n");
+				if ((fd = open(t, O_WRONLY | O_CREAT)) < 0) user_panic("> open failed!\n");
 				// dup(fd, 1);
 				// close(fd);
 				output_fd = fd;
@@ -210,7 +212,7 @@ runit:
 		close(input_fd);
 	}
 	if (output_fd != -1) {
-		dup(output_fd, 0);
+		dup(output_fd, 1);
 		close(output_fd);
 	}
 
@@ -219,7 +221,7 @@ runit:
 		return;
 	}
 	argv[argc] = 0;
-	if (debug_) {
+	if (1) {
 		writef("[%08x] SPAWN:", env->env_id);
 		for (i=0; argv[i]; i++)
 			writef(" %s", argv[i]);
@@ -229,7 +231,7 @@ runit:
 	char cmd_name[64] = {0};
 	strcpy(cmd_name, argv[0]);
 	strcat(cmd_name, ".b\0");
-	writef("cmd_name: %s\n", cmd_name);
+	// writef("cmd_name: %s\n", cmd_name);
 	if ((r = spawn(cmd_name, argv)) < 0)
 		writef("spawn %s: %e\n", cmd_name, r);
 	if (hang) {

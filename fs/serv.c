@@ -247,6 +247,22 @@ serve_sync(u_int envid)
 }
 
 void
+serve_create(u_int envid, struct Fsreq_create *rq)
+{
+        u_char path[MAXPATHLEN];
+        int isdir = rq->isdir;
+        struct File *f;
+        int r;
+        user_bcopy(rq->req_path, path, MAXPATHLEN);
+        path[MAXPATHLEN - 1] = 0;
+
+        r = file_create((char *)path, &f, isdir);
+        ipc_send(envid, r, 0, 0);
+        return;
+}
+
+
+void
 serve(void)
 {
 	u_int req, whom, perm;
@@ -291,6 +307,10 @@ serve(void)
 			case FSREQ_SYNC:
 				serve_sync(whom);
 				break;
+			
+			case FSREQ_CREATE:
+                serve_create(whom, (struct Fsreq_create *)REQVA);
+                break;
 
 			default:
 				writef("Invalid request code %d from %08x\n", whom, req);
