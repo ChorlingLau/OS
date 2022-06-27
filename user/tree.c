@@ -16,14 +16,15 @@ void tree(char *path, char *prefix) {
 }
 
 void tree_start(char *path, u_int recursive) {
-    fwritef(1, ".%s", path);
+    if (path[0] != '/') fwritef(1, "./%s\n", path);
+	else fwritef(1, ".%s\n", path);
     // DFS walk and print
     walk(path, 0, recursive);
 }
 
 void walk(char *path, int level, int recursive) {
     int fd;
-    struct File f;
+    struct File f, f_next;
     struct File *dir;
     
     // end of the recursive
@@ -31,20 +32,30 @@ void walk(char *path, int level, int recursive) {
 
     if ((fd = open(path, O_RDONLY)) < 0)
         user_panic("open %s: %e", path, fd);
-    while (readn(fd, &f, (sizeof f)) == (sizeof f)) {
-        if (f.f_name[0]) {
+	
+	if (readn(fd, &f, (sizeof f)) != sizeof f) return;
+
+	int last = 0;
+	while (!last) {
+		last = (readn(fd, &f_next, (sizeof f_next)) != sizeof f_next);
+		if (!f_next.f_name[0]) last = 1;
+		// writef("\"last\" in tree.c/walk: %d\n", last);
+		if (f.f_name[0]) {
             dir = &f;
             printcs(' ', 4*level, 0);
-            fwritef(1, "|-- %s\n", dir->f_name);
+			if (last) fwritef(1, "`-- %s\n", dir->f_name);
+            else fwritef(1, "|-- %s\n", dir->f_name);
             
             if (dir->f_type == FTYPE_DIR) {
                 char new[MAXPATHLEN] = {0};
                 strcpy(new, path);
                 strcat(new, "/");
-                strcat(new, f.f_name);
+                strcat(new, dir->f_name);
                 walk(new, level+1, recursive-1);
             }
         }
+	//	writef("f.f_name: %s, &f_next.f_name: %s\n", f.f_name, f_next.f_name);
+		user_bcopy(&f_next, &f, sizeof f);
     }
     
 }
@@ -63,7 +74,7 @@ void usage(void) {
 }
 
 void umain(int argc, char **argv) {
-	writef("tree.b start...\n");
+	// writef("tree.b start...\n");
     int i;
 
     ARGBEGIN{
@@ -79,7 +90,13 @@ void umain(int argc, char **argv) {
     if (argc == 0)
 		tree("/", "");
 	else {
-		for (i=0; i<argc; i++)
+		for (i=0; i<argc; i++) {
+			/*char path[MAXPATHLEN] = {0};
+			if (argv[i][0] != '/') {
+				strcpy(path, "/");
+			}
+			strcat(path, argv[i]);*/
 			tree(argv[i], argv[i]);
+		}
 	}
 }

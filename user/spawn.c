@@ -240,7 +240,7 @@ int spawn(char *prog, char **argv)
 //	writef("code end.\n");
 
 	struct Trapframe *tf;
-	writef("\n::::::::::spawn size : %x  sp : %x::::::::\n",size,esp);
+//	writef("\n::::::::::spawn size : %x  sp : %x::::::::\n",size,esp);
 	tf = &(envs[ENVX(child_envid)].env_tf);
 	tf->pc = UTEXT;
 	tf->regs[29]=esp;
@@ -255,7 +255,7 @@ int spawn(char *prog, char **argv)
 	{
 		if(!((* vpd)[pdeno]&PTE_V))
 			continue;
-	//	writef("point1\n");
+//		writef("point1\n");
 		for(pteno = 0;pteno<=PTX(~0);pteno++)
 		{
 			pn = (pdeno<<10)+pteno;

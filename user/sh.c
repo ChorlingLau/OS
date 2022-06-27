@@ -1,7 +1,7 @@
 #include "lib.h"
 #include <args.h>
 
-int debug_ = 1;
+int debug_ = 0;
 
 //
 // get the next token from string s
@@ -30,7 +30,6 @@ _gettoken(char *s, char **p1, char **p2)
 	}
 
 	//if (debug_ > 1) writef("GETTOKEN: %s\n", s);
-
 	*p1 = 0;
 	*p2 = 0;
 
@@ -103,9 +102,12 @@ gettoken(char *s, char **p1)
 void
 runcmd(char *s)
 {
+	if (debug_) writef("runcmd start...\n");
+	history_save(s);
+	if (debug_) writef("save a history cmd: %s\n", s);
 	char *argv[MAXARGS], *t;
 	int argc, c, i, r, p[2], fd, rightpipe;
-	int fdnum, hang = 0, pid;
+	int hang = 0, pid;
 	int input_fd = -1, output_fd = -1;
 	rightpipe = 0;
 	gettoken(s, 0);
@@ -221,7 +223,7 @@ runit:
 		return;
 	}
 	argv[argc] = 0;
-	if (1) {
+	if (debug_) {
 		writef("[%08x] SPAWN:", env->env_id);
 		for (i=0; argv[i]; i++)
 			writef(" %s", argv[i]);
@@ -234,23 +236,26 @@ runit:
 	// writef("cmd_name: %s\n", cmd_name);
 	if ((r = spawn(cmd_name, argv)) < 0)
 		writef("spawn %s: %e\n", cmd_name, r);
+	if (debug_) writef("spawn and get child envid [%08x]\n", r);
+	
 	if (hang) {
-		writef("[%d] WAIT (hang) ", r);
+		writef("[%08x] WAIT (hang) ", r);
 		for (i = 0; i < argc; i++) {
 			writef("%s ", argv[i]);
 		}
 		writef("\n");
 	}
-	if (syscall_set_env_status(r, ENV_RUNNABLE) < 0)
-		writef("set child env states failed!\n");
+//	if (syscall_set_env_status(r, ENV_RUNNABLE) < 0)
+//		writef("set child env states failed!\n");
 	close_all();
+//	if (debug_) writef("spawn and get child envid [%08x]\n", r);
 	if (r >= 0) {
 		if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
 		if (!hang) wait(r);
 		else {
 			if ((pid = fork()) == 0) {
 				wait(r);
-				writef("[%d] DONE ", r);
+				writef("\n[%08x] DONE ", r);
 				for (i = 0; i < argc; i++) {
 					writef("%s ", argv[i]);
 				}
@@ -258,7 +263,7 @@ runit:
 
 				char curpath[MAXPATHLEN] = {0};
                 curpath_get(curpath);
-                writef("%s $ ", curpath);
+                writef("LCM@superShell: %s $ ", curpath);
                 writef("\b \b");
                 exit();
 			}
@@ -272,17 +277,22 @@ runit:
 	exit();
 }
 
-// flush the whole buffer
+// flush the buffer with length of len
 void
-flush(char *buf) {
+flush(int len) {
     int i;
-    for (i = 0; i < strlen(buf); i++) writef("\b \b");
+    for (i = 0; i < len; i++) writef("\b \b");
 }
 
 void
 readline(char *buf, u_int n)
 {
+	if (debug_ > 1) writef("readline start...\n");
 	int i, r;
+	char the_history[MAXHISTSIZE][128];
+	int hist_size, hist_pos;
+	hist_size = hist_pos = history_read(the_history);
+	if (debug_ > 1) writef("successfully read history.\n");
 
 	r = 0;
 	for(i=0; i<n; i++){
@@ -291,11 +301,46 @@ readline(char *buf, u_int n)
 				writef("read error: %e", r);
 			exit();
 		}
-		if(buf[i] == '\b'){
-			if(i > 0)
+
+		if (i >= 2 && buf[i-2] == 27 && buf[i-1] == 91) {
+			switch (buf[i]) {
+				case 65:	// UP
+					writef("%c%c%c", 27, 91, 66);
+					flush(i-2);
+					if (hist_pos) strcpy(buf, the_history[--hist_pos]);
+					else strcpy(buf, the_history[hist_pos]);
+					writef("%s", buf);
+					i = strlen(buf)-1;
+					break;
+				case 66:	// DOWN
+					//writef("%c%c%c", 27, 91, 65);
+					flush(i-2);
+                    if (hist_pos < hist_size) strcpy(buf, the_history[++hist_pos]);
+                    else strcpy(buf, the_history[hist_pos]);
+                    writef("%s", buf);
+                    i = strlen(buf)-1;
+					break;
+				case 67:	// LEFT
+					writef("%c%c%c", 27, 91, 68);
+					break;
+				case 68:	// RIGHT
+                    writef("%c%c%c", 27, 91, 67);
+                    break;
+			}
+		}
+
+		if(buf[i] == '\b' || buf[i] == 127){ // delete
+			if(i > 0) {
+				buf[i] = 0;
+				flush(strlen(buf));
+				buf[i-1] = 0;
+				buf = strcat(buf, buf+i);
+				writef("%s", buf);
 				i -= 2;
-			else
+			} else {
+				buf[0] = 0;
 				i = 0;
+			}
 		}
 		if(buf[i] == '\r' || buf[i] == '\n'){
 			buf[i] = 0;
@@ -322,11 +367,11 @@ umain(int argc, char **argv)
 	int r, interactive, echocmds;
 	interactive = '?';
 	echocmds = 0;
-/*	writef("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	writef("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	writef("::                                                         ::\n");
-	writef("::              Super Shell  V0.0.0_1                      ::\n");
+	writef("::              Super Shell  V0.0.1_1                      ::\n");
 	writef("::                                                         ::\n");
-	writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");*/
+	writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	ARGBEGIN{
 	case 'd':
 		debug_++;
@@ -351,11 +396,20 @@ umain(int argc, char **argv)
 	}
 	if(interactive == '?')
 		interactive = iscons(0);
+
+	history_init();
+	curpath_init("/");
+	if (debug_ > 1) writef("end of initializing curpath and history.\n");
+
 	for(;;){
+		char curpath[MAXPATHLEN];
+		curpath_get(curpath);
+	//	if (debug_) writef("get curpath: %s\n", curpath);
 		if (interactive)
-			fwritef(1, "\n$ ");
+			fwritef(1, "\nLCM@superShell: %s $ ", curpath);
 		readline(buf, sizeof buf);
-		
+		if (debug_) writef("end of readline.\n");
+
 		if (buf[0] == '#')
 			continue;
 		if (echocmds)

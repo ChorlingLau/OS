@@ -46,7 +46,7 @@ open(const char *path, int mode)
 	// Hint: Read fsipc.c, and choose a function.
 	if ((r = fsipc_open(path, mode, fd)) < 0) {
 		if ((r == -E_NOT_FOUND) && (mode & O_CREAT)) {
-			if ((r = fsipc_create(path)) < 0) return r;
+			if ((r = fsipc_create(path, 0)) < 0) return r;
 			fsipc_open(path, mode, fd);
 	    } else {
 			return r;
@@ -285,4 +285,10 @@ int
 sync(void)
 {
 	return fsipc_sync();
+}
+
+int
+create(const char *path, int isdir)
+{
+	return fsipc_create(path, isdir);
 }

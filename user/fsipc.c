@@ -151,7 +151,7 @@ fsipc_sync(void)
 	return fsipc(FSREQ_SYNC, fsipcbuf, 0, 0);
 }
 
-int fsipc_create(const char *path)
+int fsipc_create(const char *path, int isdir)
 {
         struct Fsreq_create *req;
 
@@ -163,7 +163,7 @@ int fsipc_create(const char *path)
         }
 
         strcpy((char *)req->req_path, path);
-		req->isdir = 0;
+		req->isdir = isdir;
         return fsipc(FSREQ_CREATE, req, 0, 0);
 }
 

@@ -59,6 +59,9 @@ void env_destroy(struct Env *e);
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 void env_run(struct Env *e);
 
+char *strcpy(char*, const char *);
+int strcmp(const char *, const char *);
+u_int strhash(const char *);
 
 // for the grading script
 #define ENV_CREATE2(x, y) \

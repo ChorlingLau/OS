@@ -705,7 +705,7 @@ file_open(char *path, struct File **file)
 //	On success set *file to point at the file and return 0.
 // 	On error return < 0.
 int
-file_create(char *path, struct File **file)
+_file_create(char *path, struct File **file, int isdir)
 {
 	char name[MAXNAMELEN];
 	int r;
@@ -722,10 +722,36 @@ file_create(char *path, struct File **file)
 	if (dir_alloc_file(dir, &f) < 0) {
 		return r;
 	}
-
+	
+	if (isdir) f->f_type = FTYPE_DIR;
 	strcpy((char *)f->f_name, name);
 	*file = f;
 	return 0;
+}
+
+int
+file_create(char *path, struct File **file, int isdir) 
+{
+    int r;
+
+    // create directory along the way
+    char *p1 = path[0] == '/' ? path + 1 : 0;
+    while (p1 && *p1) {
+        while (*p1 && *p1 != '/') ++p1;
+        if (!*p1 || !*(p1 + 1)) break;
+
+        *p1 = '\0';
+
+        struct File *dir;
+        r = file_create(path, &dir, 1);
+        if (r < 0 && r != -E_FILE_EXISTS) return r;
+
+        *p1++ = '/';
+
+        dir->f_type = FTYPE_DIR;
+    }
+
+    return _file_create(path, file, isdir);
 }
 
 // Overview:

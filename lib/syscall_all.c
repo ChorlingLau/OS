@@ -1,5 +1,4 @@
 #include "../drivers/gxconsole/dev_cons.h"
-#include "../user/lib.h"
 #include <mmu.h>
 #include <env.h>
 #include <printf.h>
@@ -95,7 +94,7 @@ int sys_env_destroy(int sysno, u_int envid)
 		return r;
 	}
 
-	printf("[%08x] destroying %08x\n", curenv->env_id, e->env_id);
+//	printf("[%08x] destroying %08x\n", curenv->env_id, e->env_id);
 	env_destroy(e);
 	return 0;
 }
@@ -173,6 +172,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 				u_int perm)
 {
+
 	int ret;
 	u_int round_srcva, round_dstva;
 	struct Env *srcenv;
@@ -266,10 +266,12 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 	int ret;
 	if (!(status >= 0 && status <= 2)) return -E_INVAL;
 	if ((ret = envid2env(envid, &env, 1)) < 0) return ret;
-	env->env_status = status;
-	if (status == ENV_RUNNABLE) {
+	
+	if (status == ENV_RUNNABLE && env->env_status != ENV_RUNNABLE) {
 		LIST_INSERT_HEAD(env_sched_list, env, env_sched_link);
 	}
+
+	env->env_status = status;
 	return 0;
 	//	panic("sys_env_set_status not implemented");
 }
