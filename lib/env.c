@@ -665,3 +665,12 @@ u_int strhash(const char *str) {
     while (*str) hash = ((hash << 5) + hash) + (*str++);
     return hash % ((1 << 8) - 1);
 }
+
+char *strcat(char *dest, const char *src) {
+    char *address = dest;
+//   writef("dest:%s src:%s", dest , src);  
+	while (*dest) dest++;
+    while (*dest++ = *src++);
+    return address;
+}
+

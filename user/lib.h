@@ -67,6 +67,7 @@ void syscall_ipc_recv(u_int dstva);
 int syscall_cgetc();
 int syscall_write_dev(u_int va, u_int dev, u_int offset);
 int syscall_read_dev(u_int va, u_int dev, u_int offset);
+int syscall_env_var(char *name, char *value, u_int op, u_int mode);
 
 // string.c
 int strlen(const char *s);
@@ -158,5 +159,8 @@ int history_read(char (*cmd)[MAXHISTSIZE]);
 #define	O_EXCL		0x0400		/* error if already exists */
 #define O_MKDIR		0x0800		/* create directory, not regular file */
 
+/* Var modes */
+#define VAR_RDONLY  0x001
+#define VAR_ENVIRON 0x002
 
 #endif

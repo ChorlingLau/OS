@@ -62,6 +62,7 @@ void env_run(struct Env *e);
 char *strcpy(char*, const char *);
 int strcmp(const char *, const char *);
 u_int strhash(const char *);
+char *strcat(char *, const char *);
 
 // for the grading script
 #define ENV_CREATE2(x, y) \
