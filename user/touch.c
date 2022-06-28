@@ -6,7 +6,7 @@ void touch(char *path, char *perfix) {
 	int fd;
 	char curpath[MAXPATHLEN] = {0};
 	if (curpath_get(curpath) < 0) {
-		fwritef(1, "touch: cannot get environment var [curpath]\n");
+		fwritef(1, RED(touch: cannot get environment var [curpath]\n));
 	}
 
 	if (path[0] != '/') {
@@ -16,10 +16,10 @@ void touch(char *path, char *perfix) {
 	}
 
 	if (create(curpath, FTYPE_REG) < 0) {
-        fwritef(1, "file %s already exists!\n", curpath);
+        fwritef(1, RED(touch: file %s already exists!\n), curpath);
         return;
     }
-    fwritef(1, "successfully create file %s\n", curpath);
+    fwritef(1, "touch: successfully create file %s\n", curpath);
 }
 
 void usage() {
@@ -41,7 +41,7 @@ void umain(int argc, char **argv) {
     }
     ARGEND
     if (argc == 0) {
-        return;
+        fwritef(1, RED(touch: missing operand\n));
     } else {
         for (i = 0; i < argc; i++)
             touch(argv[i], argv[i]);

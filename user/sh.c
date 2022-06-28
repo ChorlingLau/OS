@@ -220,6 +220,7 @@ runit:
 
 	if(argc == 0) {
 		if (debug_) writef("EMPTY COMMAND\n");
+	//	writef(RED(RED ) LIGHT_RED(LIGHT_RED ) GREEN(GREEN ) LIGHT_GREEN(LIGHT_GREEN ) BLUE(BLUE ) LIGHT_BLUE(LIGHT_BLUE ) DARK_GRAY(DARK_GRAY ) CYAN(CYAN ) LIGHT_CYAN(LIGHT_CYAN ) PURPLE(PURPLE ) LIGHT_PURPLE(LIGHT_PURPLE ) BROWN(BROWN ) YELLOW(YELLOW ) LIGHT_GRAY(LIGHT_GRAY ) WHITE(WHITE ));
 		return;
 	}
 	argv[argc] = 0;
@@ -235,13 +236,13 @@ runit:
 	strcat(cmd_name, ".b\0");
 	// writef("cmd_name: %s\n", cmd_name);
 	if ((r = spawn(cmd_name, argv)) < 0)
-		writef("spawn %s: %e\n", cmd_name, r);
+		writef(RED(spawn %s: %e\n), cmd_name, r);
 	if (debug_) writef("spawn and get child envid [%08x]\n", r);
 	
 	if (hang) {
-		writef("[%08x] WAIT (hang) ", r);
+		writef(BROWN([%08x] WAIT (hang)) " ", r);
 		for (i = 0; i < argc; i++) {
-			writef("%s ", argv[i]);
+			writef(BROWN(%s) " ", argv[i]);
 		}
 		writef("\n");
 	}
@@ -255,15 +256,15 @@ runit:
 		else {
 			if ((pid = fork()) == 0) {
 				wait(r);
-				writef("\n[%08x] DONE ", r);
+				writef("\n" BROWN([%08x] DONE) " " , r);
 				for (i = 0; i < argc; i++) {
-					writef("%s ", argv[i]);
+					writef(BROWN(%s) " ", argv[i]);
 				}
 				writef("\n");
 
 				char curpath[MAXPATHLEN] = {0};
                 curpath_get(curpath);
-                writef("LCM@superShell: %s $ ", curpath);
+                writef(LIGHT_GREEN(LCM@superShell) ": " LIGHT_PURPLE(%s) " $ ", curpath);
                 writef("\b \b");
                 exit();
 			}
@@ -289,6 +290,7 @@ readline(char *buf, u_int n)
 {
 	if (debug_ > 1) writef("readline start...\n");
 	int i, r;
+	char tmp;
 	char the_history[MAXHISTSIZE][128];
 	int hist_size, hist_pos;
 	hist_size = hist_pos = history_read(the_history);
@@ -322,10 +324,14 @@ readline(char *buf, u_int n)
 					break;
 				case 67:	// LEFT
 					writef("%c%c%c", 27, 91, 68);
+					// writef("\x1b[1D");
+					i-=3;
 					break;
 				case 68:	// RIGHT
                     writef("%c%c%c", 27, 91, 67);
-                    break;
+					// writef("\x1b[1C");
+					i-=3;
+					break;
 			}
 		}
 
@@ -334,12 +340,12 @@ readline(char *buf, u_int n)
 				buf[i] = 0;
 				flush(strlen(buf));
 				buf[i-1] = 0;
-				buf = strcat(buf, buf+i);
+				buf = strcat(buf, &buf[i]);
 				writef("%s", buf);
 				i -= 2;
 			} else {
 				buf[0] = 0;
-				i = 0;
+				i -= 1;
 			}
 		}
 		if(buf[i] == '\r' || buf[i] == '\n'){
@@ -404,9 +410,9 @@ umain(int argc, char **argv)
 	for(;;){
 		char curpath[MAXPATHLEN];
 		curpath_get(curpath);
-	//	if (debug_) writef("get curpath: %s\n", curpath);
+		if (debug_) writef("get curpath: %s\n", curpath);
 		if (interactive)
-			fwritef(1, "\nLCM@superShell: %s $ ", curpath);
+			fwritef(1, LIGHT_GREEN(LCM@superShell) ": " LIGHT_PURPLE(%s) " $ ", curpath);
 		readline(buf, sizeof buf);
 		if (debug_) writef("end of readline.\n");
 

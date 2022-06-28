@@ -8,10 +8,11 @@ void declare(char *name, char *value, u_int mode) {
         if (r == -E_ENV_VAR_NOT_FOUND) {
             if (syscall_env_var(name, value, 0, mode) < 0)  // create
                 fwritef(1, "declare: too many vars\n");
+			else fwritef(1, "declare: %s=%s\n", name, value);
         } else if (r == -E_ENV_VAR_RDONLY){
             fwritef(1, "declare: [%s] is readonly\n", name);
         }
-    }
+    } else fwritef(1, "declare: %s=%s\n", name, value);
 }
 
 void list_var() {

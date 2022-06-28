@@ -7,6 +7,7 @@
 #include <env.h>
 #include <args.h>
 #include <unistd.h>
+#include "color.h"
 /////////////////////////////////////////////////////head
 extern void umain();
 extern void libmain();
@@ -138,7 +139,7 @@ int curpath_get(char *path);
 int curpath_set(char *path);
 int curpath_get_parent(char *path);
 
-// history.c
+// history_utils.c
 #define MAXHISTSIZE 128
 void history_init();
 void history_save(char* s);

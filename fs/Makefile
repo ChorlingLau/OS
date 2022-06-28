@@ -22,7 +22,7 @@ USERLIB :=	$(user_dir)/printf.o \
 		$(user_dir)/console.o \
 		$(user_dir)/fprintf.o \
 		$(user_dir)/curpath.o \
-		$(user_dir)/history.o
+		$(user_dir)/history_utils.o
 
 FSLIB :=	fs.o \
 		ide.o \
@@ -36,6 +36,9 @@ USERAPPS :=  $(user_dir)/num.b  \
 			 $(user_dir)/tree.b \
 			 $(user_dir)/mkdir.b \
 			 $(user_dir)/touch.b \
+			 $(user_dir)/declare.b \
+			 $(user_dir)/unset.b \
+			 $(user_dir)/history.b \
 		 $(user_dir)/testptelibrary.b
 
 

@@ -51,10 +51,13 @@ ls1(char *prefix, u_int isdir, u_int size, char *name)
 			sep = "";
 		fwritef(1, "%s%s", prefix, sep);
 	}
-	fwritef(1, "%s", name);
+	if (isdir) fwritef(1, LIGHT_BLUE(%-20s), name);
+    else fwritef(1, "%-20s", name);
 	if(flag['F'] && isdir)
 		fwritef(1, "/");
-	fwritef(1, " ");
+	/*if (strlen(name) < 4) fwritef(1, "\t\t\t");
+	else if (strlen(name) < 8) fwritef(1, "\t\t");
+	else*/ fwritef(1, " ");
 }
 
 void

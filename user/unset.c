@@ -9,7 +9,7 @@ void unset(char *name) {
             fwritef(1, "unset: [%s] doesn't exists\n", name);
         else if (r == -E_ENV_VAR_RDONLY)
             fwritef(1, "unset: [%s] is readonly\n", name);
-    }
+    } else fwritef(1, "unset: delete [%s]\n", name);
 }
 
 void usage(void) {

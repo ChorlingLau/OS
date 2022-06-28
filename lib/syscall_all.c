@@ -502,9 +502,9 @@ int sys_env_var(int sysno, char *name, char *value, u_int op, u_int mode) {
 			if (v->hold) {
 				if (v->environ || v->envid == envid) {
 					strcat(buf, v->name);
-					strcat(buf, '=');
+					strcat(buf, "=");
 					strcat(buf, v->value);
-					strcat(buf, '\n');
+					strcat(buf, "\n");
 				}
 			}
 		}
@@ -536,6 +536,7 @@ int sys_env_var(int sysno, char *name, char *value, u_int op, u_int mode) {
         strcpy(vars[pos].name, name);
         strcpy(vars[pos].value, value);
 		vars[pos].envid = envid;
+		vars[pos].hold = 1;
     } 
 	else if (op == 1) {
 		// get value and return with "value"

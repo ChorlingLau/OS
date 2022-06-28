@@ -8,7 +8,7 @@ void mkdir(char *path, char *perfix) {
     char curpath[MAXPATHLEN] = {0};
 
     if ((r = curpath_get(curpath)) < 0) {
-        fwritef(1, "mkdir: cannot get environment var [curpath]\n");
+        fwritef(1, RED(mkdir: cannot get environment var [curpath]\n));
     }
 
     if (path[0] == '/') {
@@ -21,7 +21,7 @@ void mkdir(char *path, char *perfix) {
     }
 
     if ((r = create(curpath, FTYPE_DIR)) < 0) {
-        fwritef(1, "mkdir: directory %s already exists\n", curpath);
+        fwritef(1, RED(mkdir: directory %s already exists\n), curpath);
     } else {
         fwritef(1, "mkdir: successfully create directory %s\n", curpath);
     }
@@ -47,11 +47,10 @@ void umain(int argc, char **argv)
 	}ARGEND
 
 	if (argc == 0)
-		fwritef(1, "mkdir: missing operand");
+		fwritef(1, RED(mkdir: missing operand\n));
 	else {
 		for (i=0; i<argc; i++)
 			mkdir(argv[i], argv[i]);
 	}
-	fwritef(1, "\n");
 }
 

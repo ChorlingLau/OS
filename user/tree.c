@@ -43,8 +43,10 @@ void walk(char *path, int level, int recursive) {
 		if (f.f_name[0]) {
             dir = &f;
             printcs(' ', 4*level, 0);
-			if (last) fwritef(1, "`-- %s\n", dir->f_name);
-            else fwritef(1, "|-- %s\n", dir->f_name);
+			if (last) fwritef(1, "`-- ", dir->f_name);
+            else fwritef(1, "|-- ", dir->f_name);
+			if (dir->f_type == FTYPE_DIR) fwritef(1, LIGHT_BLUE(%s) "\n", dir->f_name);
+			else fwritef(1, "%s\n", dir->f_name);
             
             if (dir->f_type == FTYPE_DIR) {
                 char new[MAXPATHLEN] = {0};
