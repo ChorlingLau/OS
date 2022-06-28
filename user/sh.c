@@ -196,10 +196,11 @@ again:
 				// fork a child env to run cmd at the left of ";",
 				// initialize parent env for the right
 				if ((pid = fork()) == 0) {
-                    input_fd = -1;
-                    output_fd = -1;
                     goto runit;
                 }
+				wait(pid);
+				input_fd = -1;
+                output_fd = -1;
                 argc = 0;
                 hang = 0;
                 rightpipe = 0;

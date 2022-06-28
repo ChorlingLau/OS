@@ -21,7 +21,7 @@ void umain(int argc, char **argv) {
     for (i = 0; i < size; i++) {
 		char tmp[300];
 		strcpy(tmp, cmd[i]);
-        fwritef(1, "%s\n", tmp);
+        fwritef(1, " %03d %s\n", i, tmp);
     }
 
 }
