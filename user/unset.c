@@ -4,7 +4,8 @@ int flag[256];
 
 void unset(char *name) {
     int r;
-    if ((r = syscall_env_var(name, 0, 3, 0))) { // unset
+    u_int envid = envid2faid(envid2faid(syscall_getenvid()));
+    if ((r = syscall_env_var(envid, name, 0, 3, 0))) { // unset
         if (r == -E_ENV_VAR_NOT_FOUND)
             fwritef(1, "unset: [%s] doesn't exists\n", name);
         else if (r == -E_ENV_VAR_RDONLY)

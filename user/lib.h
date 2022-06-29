@@ -68,7 +68,7 @@ void syscall_ipc_recv(u_int dstva);
 int syscall_cgetc();
 int syscall_write_dev(u_int va, u_int dev, u_int offset);
 int syscall_read_dev(u_int va, u_int dev, u_int offset);
-int syscall_env_var(char *name, char *value, u_int op, u_int mode);
+int syscall_env_var(u_int envid, char *name, char *value, u_int op, u_int mode);
 
 // string.c
 int strlen(const char *s);
@@ -165,4 +165,9 @@ int history_read(char (*cmd)[MAXHISTSIZE]);
 #define VAR_ENVIRON 0x002
 
 #define CURPATH_KEY	"curpath"
+u_int envid2faid(u_int envid) {
+	struct Env *e;
+	envid2env(envid, &e, 0);
+	return e->env_parent_id;
+}
 #endif

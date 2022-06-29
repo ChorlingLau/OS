@@ -4,9 +4,10 @@ int flag[256];
 
 void declare(char *name, char *value, u_int mode) {
     int r;
-    if ((r = syscall_env_var(name, value, 2, mode)) < 0) { // set
+    u_int envid = envid2faid(envid2faid(syscall_getenvid()));
+    if ((r = syscall_env_var(envid, name, value, 2, mode)) < 0) { // set
         if (r == -E_ENV_VAR_NOT_FOUND) {
-            if (syscall_env_var(name, value, 0, mode) < 0)  // create
+            if (syscall_env_var(envid, name, value, 0, mode) < 0)  // create
                 fwritef(1, "declare: too many vars\n");
 			else fwritef(1, "declare: %s=%s\n", name, value);
         } else if (r == -E_ENV_VAR_RDONLY){
@@ -17,7 +18,8 @@ void declare(char *name, char *value, u_int mode) {
 
 void list_var() {
     char buf[51200];
-    if (syscall_env_var(0, buf, 4, 0) < 0) {    // get list
+    u_int envid = envid2faid(envid2faid(syscall_getenvid()));
+    if (syscall_env_var(envid, 0, buf, 4, 0) < 0) {    // get list
         fwritef(1, "declare: none of vars\n");
     } else {
         fwritef(1, "%s", buf);

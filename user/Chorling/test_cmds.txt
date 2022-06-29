@@ -7,3 +7,19 @@ touch lcm/file1.txt dir3/file2.txt
 tree (UP*3)
 tree lcm
 history
+declare a =local_var
+declare -r b =readonly_local_var
+declare -x c =env_var
+declare -rx d =readonly_env_var
+declare
+unset a b c d
+declare
+declare a =local_var
+declare -r b =readonly_local_var
+declare -x c =env_var
+declare -rx d =readonly_env_var
+declare
+echo $a $b $c $d
+echo "$a $b $c $d"
+sh
+declare
