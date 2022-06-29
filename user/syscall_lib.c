@@ -17,9 +17,9 @@ syscall_getenvid(void)
 }
 
 u_int
-syscall_getfaid(void)
+syscall_getfaid(u_int envid)
 {
-	return msyscall(SYS_getfaid, 0, 0, 0, 0, 0);
+	return msyscall(SYS_getfaid, envid, 0, 0, 0, 0);
 }
 
 void
