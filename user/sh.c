@@ -133,7 +133,7 @@ again:
 				argv[argc] = t;
 				if (t[0] == '$') {
 					char value[128] = {0};
-					u_int envid = envid2faid(syscall_getenvid());
+					u_int envid = syscall_getfaid(syscall_getenvid());
 					if (syscall_env_var(envid, t+1, value, 1, 0) == 0) {
 						argv[argc] = value;
 					}

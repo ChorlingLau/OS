@@ -55,6 +55,13 @@ u_int sys_getenvid(void)
 	return curenv->env_id;
 }
 
+u_int sys_getfaid(u_int envid)
+{
+	struct Env *e;
+	envid2env(envid, &e, 0);
+	return e->env_parent_id;
+}
+
 /* Overview:
  *	This function enables the current process to give up CPU.
  *

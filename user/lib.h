@@ -46,6 +46,7 @@ extern int msyscall(int, int, int, int, int, int);
 
 void syscall_putchar(char ch);
 u_int syscall_getenvid(void);
+u_int syscall_getfaid(u_int);
 void syscall_yield(void);
 int syscall_env_destroy(u_int envid);
 int syscall_set_pgfault_handler(u_int envid, void (*func)(void),
@@ -165,9 +166,5 @@ int history_read(char (*cmd)[MAXHISTSIZE]);
 #define VAR_ENVIRON 0x002
 
 #define CURPATH_KEY	"curpath"
-u_int envid2faid(u_int envid) {
-	struct Env *e;
-	envid2env(envid, &e, 0);
-	return e->env_parent_id;
-}
+
 #endif

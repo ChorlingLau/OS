@@ -4,7 +4,7 @@ int flag[256];
 
 void declare(char *name, char *value, u_int mode) {
     int r;
-    u_int envid = envid2faid(envid2faid(syscall_getenvid()));
+    u_int envid = syscall_getfaid(syscall_getfaid(syscall_getenvid()));
     if ((r = syscall_env_var(envid, name, value, 2, mode)) < 0) { // set
         if (r == -E_ENV_VAR_NOT_FOUND) {
             if (syscall_env_var(envid, name, value, 0, mode) < 0)  // create
@@ -18,7 +18,7 @@ void declare(char *name, char *value, u_int mode) {
 
 void list_var() {
     char buf[51200];
-    u_int envid = envid2faid(envid2faid(syscall_getenvid()));
+    u_int envid = syscall_getfaid(syscall_getfaid(syscall_getenvid()));
     if (syscall_env_var(envid, 0, buf, 4, 0) < 0) {    // get list
         fwritef(1, "declare: none of vars\n");
     } else {

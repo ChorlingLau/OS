@@ -16,6 +16,12 @@ syscall_getenvid(void)
 	return msyscall(SYS_getenvid, 0, 0, 0, 0, 0);
 }
 
+u_int
+syscall_getfaid(void)
+{
+	return msyscall(SYS_getfaid, 0, 0, 0, 0, 0);
+}
+
 void
 syscall_yield(void)
 {
