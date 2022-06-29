@@ -490,9 +490,8 @@ struct Var {
 };
 static struct Var vars[NVARS] = {0};
 
-int sys_env_var(int sysno, char *name, char *value, u_int op, u_int mode) {
-	u_int envid = sys_getenvid();
-	
+int sys_env_var(int sysno, u_int envid, char *name, char *value, u_int op, u_int mode) {
+		
 	// get list
     if (op == 4) {
 		char buf[51200] = {0};
@@ -517,9 +516,13 @@ int sys_env_var(int sysno, char *name, char *value, u_int op, u_int mode) {
 	u_int init_pos = pos;
     while (1) {
 		struct Var *v = &vars[pos];
+		if (v->hold) {
+			printf("env: %d, envid: %d(%d), name: %s(%s)\n", v->environ, v->envid, envid, v->name, name);
+		}
         if (v->hold && (v->environ || v->envid == envid) &&
 			strcmp(v->name, name) == 0) {
 			// found
+			// printf("found %s\n", name);
             break;
         } else {
 			// create here if op=(create)	

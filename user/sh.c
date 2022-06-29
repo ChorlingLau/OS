@@ -47,7 +47,7 @@ _gettoken(char *s, char **p1, char **p2)
 		while (*s && !(*s == '\"' && *(s-1) != '\\')) s++;
 		*s++ = 0;
 		*p2 = s;
-		return 'w';
+		return 'q';
 	}
 	
 	// get a symbol and return it for analysis
@@ -118,12 +118,26 @@ again:
 		switch(c){
 			case 0:
 				goto runit;
+			case 'q':
+				if(argc == MAXARGS){
+                    writef("too many arguments\n");
+                    exit();
+                }
+                argv[argc++] = t;
+				break;
 			case 'w':
 				if(argc == MAXARGS){
 					writef("too many arguments\n");
 					exit();
 				}
-				argv[argc++] = t;
+				argv[argc] = t;
+				if (t[0] == '$') {
+					char value[128] = {0};
+					if (syscall_env_var(t+1, value, 1, 0) == 0) {
+						argv[argc] = value;
+					}
+				}
+				argc++;
 				break;
 			case '<':
 				if(gettoken(0, &t) != 'w'){
