@@ -1,0 +1,9 @@
+cat Chorling/test_cmds.txt
+test_hang &
+echo " <|>&;()"
+ls;tree
+mkdir lcm/dir1 dir2
+touch lcm/file1.txt dir3/file2.txt
+tree (UP*3)
+tree lcm
+history

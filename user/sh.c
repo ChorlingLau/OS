@@ -263,11 +263,11 @@ runit:
 				}
 				writef("\n");
 
-				char curpath[MAXPATHLEN] = {0};
-                curpath_get(curpath);
-                writef(LIGHT_GREEN(LCM@superShell) ": " LIGHT_PURPLE(%s) " $ ", curpath);
-                writef("\b \b");
-                exit();
+				// char curpath[MAXPATHLEN] = {0};
+                // curpath_get(curpath);
+                // writef(LIGHT_GREEN(LCM@superShell) ": " LIGHT_PURPLE(%s) " $ ", curpath);
+                // writef("\b \b");
+                // exit();
 			}
 		}
 	}
@@ -374,11 +374,14 @@ umain(int argc, char **argv)
 	int r, interactive, echocmds;
 	interactive = '?';
 	echocmds = 0;
+	writef("\033[1;35m");
 	writef("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	writef("::                                                         ::\n");
 	writef("::              Super Shell  V0.0.1_1                      ::\n");
 	writef("::                                                         ::\n");
 	writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	writef("\033[m");
+
 	ARGBEGIN{
 	case 'd':
 		debug_++;

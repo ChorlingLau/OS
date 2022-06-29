@@ -78,6 +78,7 @@ fs.img: $(FSIMGFILES)
 	dd if=/dev/zero of=../gxemul/fs.img bs=4096 count=1024 2>/dev/null
 	gcc $(INCLUDES) fsformat.c -o $(tools_dir)/fsformat -m32
 	chmod +x $(tools_dir)/fsformat
+	$(tools_dir)/fsformat ../gxemul/fs.img -r $(user_dir)/Chorling
 	$(tools_dir)/fsformat ../gxemul/fs.img $(FSIMGFILES)
 
 .PHONY: clean

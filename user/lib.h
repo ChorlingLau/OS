@@ -164,4 +164,5 @@ int history_read(char (*cmd)[MAXHISTSIZE]);
 #define VAR_RDONLY  0x001
 #define VAR_ENVIRON 0x002
 
+#define CURPATH_KEY	"curpath"
 #endif

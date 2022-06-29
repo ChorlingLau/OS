@@ -44,20 +44,22 @@ ls1(char *prefix, u_int isdir, u_int size, char *name)
 
 	if(flag['l'])
 		fwritef(1, "%11d %c ", size, isdir ? 'd' : '-');
-	if(prefix) {
-		if (prefix[0] && prefix[strlen(prefix)-1] != '/')
-			sep = "/";
-		else
-			sep = "";
-		fwritef(1, "%s%s", prefix, sep);
-	}
-	if (isdir) fwritef(1, LIGHT_BLUE(%-20s), name);
-    else fwritef(1, "%-20s", name);
+	// if(prefix) {
+	// 	if (prefix[0] && prefix[strlen(prefix)-1] != '/')
+	// 		sep = "/";
+	// 	else
+	// 		sep = "";
+	// 	fwritef(1, "%s%s", prefix, sep);
+	// }
+	if (isdir) 
+		fwritef(1, LIGHT_BLUE(%-20s), name);
+    else if (name[strlen(name)-1] == 'b' && name[strlen(name)-2] == '.') 
+		fwritef(1, LIGHT_GREEN(%-20s), name);
+	else 
+		fwritef(1, "%-20s", name);
 	if(flag['F'] && isdir)
 		fwritef(1, "/");
-	/*if (strlen(name) < 4) fwritef(1, "\t\t\t");
-	else if (strlen(name) < 8) fwritef(1, "\t\t");
-	else*/ fwritef(1, " ");
+	fwritef(1, " ");
 }
 
 void

@@ -549,11 +549,12 @@ int sys_env_var(int sysno, char *name, char *value, u_int op, u_int mode) {
     } 
 	else if (op == 3) {
 		// delete the var if not read only
+		if (strcmp(vars[pos].name, "curpath") == 0) return;
         if (vars[pos].readonly) return -E_ENV_VAR_RDONLY;
 		vars[pos].hold = 0;
     }
 
-	if (mode & 0x001)	// read only
+	if (mode & 0x001 && strcmp(vars[pos].name, "curpath") != 0)	// read only
 		vars[pos].readonly = 1;
 	if (mode & 0x002)
 		vars[pos].environ = 1;
