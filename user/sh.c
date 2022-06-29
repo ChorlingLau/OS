@@ -105,7 +105,7 @@ runcmd(char *s)
 	if (debug_) writef("runcmd start...\n");
 	history_save(s);
 	if (debug_) writef("save a history cmd: %s\n", s);
-	char *argv[MAXARGS], *t;
+	char *argv[MAXARGS], *t, value[MAXARGS][128];
 	int argc, c, i, r, p[2], fd, rightpipe;
 	int hang = 0, pid;
 	int input_fd = -1, output_fd = -1;
@@ -132,10 +132,9 @@ again:
 				}
 				argv[argc] = t;
 				if (t[0] == '$') {
-					char value[128] = {0};
 					u_int envid = syscall_getfaid(syscall_getenvid());
-					if (syscall_env_var(envid, t+1, value, 1, 0) == 0) {
-						argv[argc] = value;
+					if (syscall_env_var(envid, t+1, value[argc], 1, 0) == 0) {
+						argv[argc] = value[argc];
 					}
 				}
 				argc++;
@@ -422,6 +421,7 @@ umain(int argc, char **argv)
 	if(interactive == '?')
 		interactive = iscons(0);
 
+	if (debug_ > 1) writef("start of initializing curpath and history.\n");
 	history_init();
 	curpath_init("/");
 	if (debug_ > 1) writef("end of initializing curpath and history.\n");
