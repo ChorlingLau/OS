@@ -1,10 +1,8 @@
-cat Chorling/test_cmds.txt
 test_hang &
 echo " <|>&;()"
 ls;tree
 mkdir lcm/dir1 dir2
 touch lcm/file1.txt dir3/file2.txt
-tree (UP*3)
 tree lcm
 history
 declare a =local_var
@@ -22,4 +20,7 @@ declare
 echo $a $b $c $d
 echo "$a $b $c $d"
 sh
-declare
+ls
+declare >lcm/file3.txt
+echo "----DECLARE END----" >>lcm/file3.txt;echo "<cmd at the right of ;>" >>motd
+cat lcm/file3.txt
